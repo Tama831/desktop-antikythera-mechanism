@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巡る天の心臓 — 印刷計画書</title>
+<style>
+  :root { --bg:#0d1220; --card:#151c2e; --brass:#c9a227; --silver:#aab4c4; --text:#e8e4d8; --sub:#9aa3b5; --accent:#d4614a; --ok:#7fc98f; --flow:#5ec8e0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; line-height:1.75; padding:2rem 1rem 4rem; }
+  .wrap { max-width:780px; margin:0 auto; }
+  h1 { font-size:1.25rem; color:var(--brass); text-align:center; letter-spacing:0.06em; }
+  header p { color:var(--sub); font-size:0.88rem; text-align:center; margin-top:0.5rem; }
+  .card { background:var(--card); border:1px solid #232d45; border-radius:14px; padding:1.4rem; margin:1.5rem 0; }
+  .card h2 { font-size:1.02rem; color:var(--brass); margin-bottom:0.7rem; }
+  table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+  th, td { padding:0.42rem 0.5rem; border-bottom:1px solid #232d45; text-align:left; vertical-align:top; }
+  th { color:var(--brass); font-weight:600; white-space:nowrap; }
+  td.n { color:var(--flow); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .sum { background:#10182a; border-radius:10px; padding:0.9rem 1.1rem; display:flex; flex-wrap:wrap; gap:1.2rem; justify-content:center; font-size:0.9rem; margin-bottom:0.4rem;}
+  .sum b { color:var(--flow); font-size:1.15rem; }
+  .sum span { color:var(--sub); font-size:0.78rem; display:block; text-align:center;}
+  .note { background:#10182a; border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:0.8rem 1.1rem; font-size:0.86rem; margin-top:0.8rem; }
+  .note b { color:var(--accent); }
+  .ok { color: var(--ok); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>巡る天の心臓 — 印刷計画書</h1>
+  <p>Phrozen Sonic Mini 4K (133×75×130) × タフレジン・レイヤー0.05mm 想定 — 岐阜の日は「開封→即印刷」</p>
+</header>
+
+<div class="card">
+  <h2>ぜんぶでどのくらい?</h2>
+  <div class="sum">
+    <div><b>34個</b><span>印刷部品 (23種)</span></div>
+    <div><b>約165cc</b><span>実体樹脂 (+サポート≈200cc)</span></div>
+    <div><b>約260g</b><span>レジン消費 (500g瓶1本+予備)</span></div>
+    <div><b>14プレート</b><span>プレート数</span></div>
+    <div><b>約16時間</b><span>機械時間合計</span></div>
+    <div><b>¥1,200〜1,600</b><span>樹脂コスト概算</span></div>
+  </div>
+  <p style="font-size:0.8rem;color:var(--sub);">時間はプレートの最大高さ×約2.8分/mm (露光2.5s+リフト) の概算。実測でキャリブレーションを。</p>
+</div>
+
+<div class="card">
+  <h2>プレート割り (推奨順 — 小さく検証してから大物へ)</h2>
+  <table>
+    <tr><th>#</th><th>のせる物</th><th>最大高</th><th>時間目安</th><th>ねらい</th></tr>
+    <tr><td>P1</td><td><b>小物一式</b>: ring46・ub_w1p1×2・ub_w3・sun・planet×2・bevel_sun・crown_idler・saros_idler(45°)・e2p・ret・ub_pinionA・ub_lantern・stud_cap×3・splice×3</td><td class="n">~10mm</td><td class="n">~30分</td><td>復活直後の<b>キャリブレーション兼ね</b>。歯の出方・圧入穴の寸法をここで検品</td></tr>
+    <tr><td>P2</td><td><b>中背もの</b>: motor_mount・st1_carrier・coupling・hand_knob・moon_globe(サポート)・inner_frame</td><td class="n">30mm</td><td class="n">~1.4h</td><td>P1の寸法検品が通ってから</td></tr>
+    <tr><td>P3</td><td><b>心臓と背骨</b>: cage_core(冠歯上向き)・spine(逆さ・柱サポート)</td><td class="n">39mm</td><td class="n">~1.9h</td><td>主役2部品を1枚で。雷文と冠歯の出方を検品</td></tr>
+    <tr><td>P4-6</td><td>saros_seg0 / 1 / 2 (各1枚)</td><td class="n">5mm</td><td class="n">各~15分</td><td>低くて速い。223目盛の彫りを検品</td></tr>
+    <tr><td>P7-8</td><td>ring_seg0 / 1 (各1枚)</td><td class="n">7.6mm</td><td class="n">各~22分</td><td>十二宮の彫りを検品</td></tr>
+    <tr><td>P9</td><td>ring_seg2 (太陽玉つき・玉にサポート)</td><td class="n">15.6mm</td><td class="n">~44分</td><td>—</td></tr>
+    <tr><td>P10-12</td><td>horizon_seg0 / 1 / 2 (各1枚)</td><td class="n">3mm</td><td class="n">各~9分</td><td>薄物の反り注意 — 底面ベタ付け</td></tr>
+    <tr><td>P13</td><td><b>base_seg1</b> (94×87→回転して94×72で載せる)</td><td class="n">72.5mm</td><td class="n">~3.4h</td><td>柱が伸びる長丁場。裏スタッドにサポート</td></tr>
+    <tr><td>P14+</td><td><b>base_seg0 / base_seg2</b> (各1枚)</td><td class="n">~77mm</td><td class="n">各~3.6h</td><td>最後の大物2枚。刻印面はプレート側 — 文字はそのまま出る</td></tr>
+  </table>
+  <div class="note"><b>プレートに載るかの根拠:</b> 全部品は回転考慮でビルド域 133×75 に収まることを検証済み (base_seg は要回転)。
+  実スライサーでの配置時、ここの組を崩しても高さの近い者同士でまとめれば時間は同等。</div>
+</div>
+
+<div class="card">
+  <h2>部品別データ (実測: STLから算出)</h2>
+  <table>
+    <tr><th>部品</th><th>個数</th><th>樹脂/個</th><th>底面 (mm)</th><th>高さ</th><th>姿勢・サポート</th></tr>
+    <tr><td>base_seg0/1/2</td><td class="n">3</td><td class="n">~17.4cc</td><td class="n">~119×72</td><td class="n">72-77</td><td>表を上・柱そのまま上へ。裏スタッド4本に軽サポート</td></tr>
+    <tr><td>cage_core</td><td class="n">1</td><td class="n">17.1cc</td><td class="n">70×70</td><td class="n">36</td><td><b>冠歯上向き=逆さ</b>・腕とE1にサポート</td></tr>
+    <tr><td>motor_mount</td><td class="n">1</td><td class="n">11.3cc</td><td class="n">58×32</td><td class="n">22</td><td>平置き</td></tr>
+    <tr><td>saros_seg 各</td><td class="n">3</td><td class="n">8.4cc</td><td class="n">104×70</td><td class="n">5</td><td>平置き・彫り面上</td></tr>
+    <tr><td>spine</td><td class="n">1</td><td class="n">6.2cc</td><td class="n">44×44</td><td class="n">39</td><td><b>逆さ (ボス下向き…プレート側)</b>・傾斜柱2本にサポート</td></tr>
+    <tr><td>ring_seg 各</td><td class="n">3</td><td class="n">~5.1cc</td><td class="n">~96×65</td><td class="n">7.6-15.6</td><td>上面上・seg2の太陽玉にサポート</td></tr>
+    <tr><td>ring46</td><td class="n">1</td><td class="n">5.1cc</td><td class="n">72×72</td><td class="n">6.6</td><td>ピン上向き・下面溝は小さくサポート不要見込み</td></tr>
+    <tr><td>hand_knob / crown_idler / saros_idler</td><td class="n">各1</td><td class="n">3.5-4.5cc</td><td class="n">~35角</td><td class="n">7-15</td><td>saros_idler はピン折れ防止で45°</td></tr>
+    <tr><td>inner_frame / st1_carrier</td><td class="n">各1</td><td class="n">~3cc</td><td class="n">~31角</td><td class="n">20-30</td><td>st1 はハブ筒を縦に</td></tr>
+    <tr><td>horizon_seg 各</td><td class="n">3</td><td class="n">1.2cc</td><td class="n">~110×55</td><td class="n">3</td><td>ベタ付け平置き (反り注意)</td></tr>
+    <tr><td>小物 (傘・月・遊星・太陽・E2P・G・地下輪列・キャップ・継ぎ板)</td><td class="n">17</td><td class="n">計~8cc</td><td class="n">—</td><td class="n">1-16</td><td>月球のみサポート・歯車は◎向き平置き</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>岐阜の日のチェックリスト</h2>
+  <table>
+    <tr><th>順</th><th>やること</th></tr>
+    <tr><td>0</td><td>プリンタ復活チェック (nFEP膜・LCD露光テスト・Z軸・<b>タフレジン新調500g</b>) — reference_gifu_3d_printer の手順</td></tr>
+    <tr><td>1</td><td>露光キャリブレーション (付属テストか XP2 バリデータ) — タフレジンの適正露光を確定</td></tr>
+    <tr><td>2</td><td><b>P1 小物プレート</b>を印刷 → 圧入穴φ2.85に真鍮3.0が入るか・歯形の出・ピンの立ちを検品。ダメなら露光/穴径を調整して再戦</td></tr>
+    <tr><td>3</td><td>P2〜P12 を順に (すきま時間で回せる短いプレート群)</td></tr>
+    <tr><td>4</td><td>base_seg 3枚 (各3.5h — 夜に仕掛けるのが吉)</td></tr>
+    <tr><td>5</td><td>組み立ては「組み立ての書」(kumitate-guide-v6.html) の Stage 0 から</td></tr>
+  </table>
+  <div class="note"><b>覚え書き:</b> 光造形の寸法はレジンロット・露光で±0.05〜0.1mm動く。φ2.85圧入と提灯まわりが渋いのは想定内 —
+  ピンバイスと紙シムで「当たり調整」する前提の設計 (BOM末尾)。</div>
+</div>
+
+<footer style="text-align:center; color:#5a6478; font-size:0.75rem; margin-top:2rem;">
+  巡る天の心臓 v0.7 印刷計画書 (2026-08-16) — 実測データ: stl_v6/ 全33ファイルから算出<br>
+  たまさん × Claude 共作 — 印刷の日を、楽しみに 🖨️
+</footer>
+</div>
+</body>
+</html>

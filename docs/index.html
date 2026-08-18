@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巡る天の心臓 — アンティキティラ × トゥールビヨン</title>
+<meta property="og:title" content="巡る天の心臓 — アンティキティラ × トゥールビヨン">
+<meta property="og:description" content="2000年前の天文計算機に18.6年の歳差を仕込んだ真・3軸機構。すべて歯数の整数比から。">
+<style>
+  :root { --bg:#0d1220; --card:#151c2e; --brass:#c9a227; --silver:#aab4c4; --text:#e8e4d8; --sub:#9aa3b5; --flow:#5ec8e0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; line-height:1.8; padding:2rem 1rem 4rem; }
+  .wrap { max-width:780px; margin:0 auto; }
+  h1 { font-size:1.35rem; color:var(--brass); text-align:center; letter-spacing:0.06em; }
+  header p { color:var(--sub); font-size:0.9rem; text-align:center; margin-top:0.6rem; }
+  .gif { display:flex; justify-content:center; background:radial-gradient(circle at 50% 45%, #1a2340 0%, #0d1220 78%); border-radius:12px; padding:0.8rem; margin:1.4rem 0 0.3rem; }
+  .gif img { max-width:100%; border-radius:8px; }
+  .cap { font-size:0.78rem; color:var(--sub); text-align:center; margin-bottom:1rem; }
+  .cards { display:grid; gap:0.8rem; margin:1.6rem 0; }
+  a.card { display:flex; gap:1rem; align-items:center; background:var(--card); border:1px solid #232d45; border-radius:12px; padding:1.1rem 1.3rem; text-decoration:none; color:var(--text); transition:border-color .15s; }
+  a.card:hover { border-color:var(--brass); }
+  .card .ic { font-size:1.6rem; }
+  .card h3 { font-size:0.98rem; color:var(--brass); }
+  .card p { font-size:0.82rem; color:var(--sub); margin-top:0.15rem; }
+  .facts { background:var(--card); border:1px solid #232d45; border-radius:12px; padding:1.1rem 1.3rem; font-size:0.86rem; margin:1.4rem 0; }
+  .facts b { color:var(--flow); }
+  footer { text-align:center; color:#5a6478; font-size:0.75rem; margin-top:2.5rem; }
+  .back { display:block; text-align:center; margin-top:1.5rem; font-size:0.85rem; }
+  .back a { color:var(--silver); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>巡る天の心臓<br><span style="font-size:0.85rem;color:var(--sub);">アンティキティラ × トゥールビヨン — 真・3軸機構</span></h1>
+  <p>2000年前の天文計算機の子孫に、月の秤動・サロス周期・傾く天球、そして<br>
+  <b style="color:var(--brass);">18.6年の交点歳差 (誤差+0.10%)</b> を仕込みました。すべて歯数の整数比から。</p>
+</header>
+
+<div class="gif"><img src="turntable_v6c.gif" alt="全体観覧" loading="lazy"></div>
+<p class="cap">全体観覧 — リング1回転 = 1朔望月。月がうなずき、サロスが食を数え、太陽玉が黄道を巡る</p>
+
+<div class="gif"><img src="precession_v6c.gif" alt="歳差デモ" loading="lazy"></div>
+<p class="cap">歳差デモ — 傾いた心臓の回転軸そのものが円錐を描く (実機は地下輪列 1/684.66 が自動で駆動)</p>
+
+<div class="cards">
+  <a class="card" href="mechanism-explainer-v6.html"><span class="ic">🔭</span><div><h3>三つの軸はどう巡るのか (機構解説)</h3><p>動力の川・側面模式図・考証表・Q&A。GIF埋め込みの読み物 (7.9MB)</p></div></a>
+  <a class="card" href="kumitate-guide-v6.html"><span class="ic">🔧</span><div><h3>組み立ての書</h3><p>Stage 0〜4 の積み上げ手順。哲学は「各段で必ず動く」</p></div></a>
+  <a class="card" href="print-plan-v6.html"><span class="ic">🖨️</span><div><h3>印刷計画書</h3><p>34部品・樹脂165cc・14プレート・約16時間の段取り (実測データから)</p></div></a>
+  <a class="card" href="adjacency-ledger-v6.html"><span class="ic">📋</span><div><h3>隣接台帳 (検証記録)</h3><p>噛合15+接触25=40関係の全数監査。「ぶつからない」と「ちゃんと触れている」は別の検査</p></div></a>
+</div>
+
+<div class="facts">
+  <b>設計の事実:</b> 部品34個 (3Dプリント34+真鍮軸3)・歯車35枚・修正35件の検証履歴・
+  検査は collide / bite / シェル / engage の四点測量。<br>
+  <b>考証:</b> 月の自転1:1 (厳密) / 太陽年 0.19% / 交点歳差 0.10% — 古代の設計思想 (整数比の歯車) をそのまま延長。<br>
+  <b>状態:</b> 設計・検証フェーズ完了。<b>実機は未印刷</b> — 光造形プリンタでの実体化はこれから。
+</div>
+
+<footer>
+  家庭医 たま × Claude (AI) の共作 (2026-07〜08) — OpenSCAD による全パラメトリック設計<br>
+  「学び方をデザインする」の実験: 2000年前の学びの装置を、自分の手で組み直す
+</footer>
+<p class="back"><a href="https://github.com/Tama831/meguru-ten-no-shinzo">⚙ GitHub — 設計ソース (OpenSCAD)・STL・検証台帳</a></p>
+</div>
+</body>
+</html>

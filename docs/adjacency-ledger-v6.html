@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巡る天の心臓 — 隣接台帳</title>
+<style>
+:root { --bg:#0d1220; --card:#151c2e; --brass:#c9a227; --silver:#aab4c4; --text:#e8e4d8; --sub:#9aa3b5; --accent:#d4614a; --ok:#7fc98f; --flow:#5ec8e0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; line-height:1.7; padding:2rem 1rem 4rem; }
+.wrap { max-width:820px; margin:0 auto; }
+h1 { font-size:1.25rem; color:var(--brass); text-align:center; letter-spacing:0.06em; }
+header p { color:var(--sub); font-size:0.86rem; text-align:center; margin-top:0.5rem; }
+.card { background:var(--card); border:1px solid #232d45; border-radius:14px; padding:1.4rem; margin:1.5rem 0; }
+.card h2 { font-size:1.02rem; color:var(--brass); margin-bottom:0.7rem; }
+table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+th, td { padding:0.4rem 0.5rem; border-bottom:1px solid #232d45; text-align:left; vertical-align:top; }
+th { color:var(--brass); font-weight:600; white-space:nowrap; }
+.sum { background:#10182a; border-radius:10px; padding:0.9rem 1.1rem; display:flex; flex-wrap:wrap; gap:1.2rem; justify-content:center; font-size:0.9rem; }
+.sum b { color:var(--ok); font-size:1.15rem; } .sum span { color:var(--sub); font-size:0.76rem; display:block; text-align:center; }
+.note { background:#10182a; border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:0.8rem 1.1rem; font-size:0.85rem; margin-top:0.8rem; }
+.note b { color:var(--accent); }
+</style></head><body><div class="wrap">
+<header><h1>巡る天の心臓 — 隣接台帳</h1>
+<p>全構造物の「隣は誰か・ちゃんと触れているか」の全数監査 (2026-08-17)。<br>
+従来の collide (ぶつからない)・bite (噛み込まない) に、新設 <b>engage (寄せたら必ず重なる=実在する接触)</b> を加えた三点測量</p></header>
+
+<div class="card"><h2>総括</h2>
+<div class="sum">
+<div><b>15/15</b><span>機能噛合 engage 実在 ✅</span></div>
+<div><b>40関係</b><span>数値再計算・全照合</span></div>
+<div><b>25件</b><span>はめあい (journal/圧入/座/接着)</span></div>
+<div><b>fix35</b><span>監査の戦果 (ジャーナル2穴)</span></div>
+</div>
+<div class="note"><b>監査で見つかったもの:</b> ①<b>fix35</b> — 縦シャフトとベース床の穴が通し径3.6のままで
+0.6mmのガタ (提灯×冠環の噛み深さ~1mmを食い潰す恐れ) → 標準ジャーナル3.4へ ②BOMの「冠傘圧入」は実際は
+すきま0.15+瞬着 (v0.2以来の意図) → 表記を接着に訂正 ③背骨boreの3.6は意図的 (ターンテーブルは軸と別速度で回る)</div></div>
+
+<div class="card"><h2>Ⅰ. 噛合関係 (15ペア) — 軸間の理論照合 × engage 実在体積</h2>
+<table><tr><th>駆動側</th><th>従動側</th><th>幾何 (理論=実装)</th><th>実在証明 (engage/bite)</th><th>判定</th></tr><tr><td>太陽12T</td><td>遊星12T ×2</td><td>m1.5・軸間 18.00 = 理論18.00</td><td>EP1: 2.11mm³</td><td>✅</td></tr><tr><td>遊星12T</td><td>リング内歯36</td><td>軸間 18.00 = 理論18.00 (内歯+0.25バックラッシ)</td><td>EP2: 0.77mm³</td><td>✅</td></tr><tr><td>リング外歯46T</td><td>サロス中間輪22T</td><td>軸間 51.00 = 理論51.00</td><td>EP3: 3.59mm³ / PAIR2 4/4</td><td>✅</td></tr><tr><td>サロス提灯6ピン</td><td>サロス内歯74</td><td>ピン円4.5 = 真ピッチ (fix29b)</td><td>EP4: 0.75mm³ / PAIR3 位相8/8</td><td>✅</td></tr><tr><td>リング外歯46T</td><td>冠アイドラ22T</td><td>軸間 51.00 = 理論51.00</td><td>EP5: 3.58mm³ / PAIR4 0.001受容</td><td>✅</td></tr><tr><td>冠アイドラ11T</td><td>st1 主輪19T</td><td>軸間 22.50 = 理論22.50</td><td>EP6: 1.16mm³ / PAIR5 0.15-0.24受容</td><td>✅</td></tr><tr><td>st1提灯6ピン</td><td>天球 冠歯90</td><td>ピン円3.82 = 傾斜投影整合</td><td>EP7: 10.24mm³ / PAIR6 6.1-6.7受容</td><td>✅</td></tr><tr><td>リング上面ピン24</td><td>かご冠歯24</td><td>ピン円28.7 = 冠ピッチ26.5の12°投影 (fix27テーパー)</td><td>EP8: 0.09mm³ / PAIR10 0mm³</td><td>✅</td></tr><tr><td>冠傘24T (固定)</td><td>フレーム傘24T</td><td>45°/45°マイター・apex共有 (局所z43)</td><td>EP9: 51.57mm³ / v0.5-C 8/8</td><td>✅</td></tr><tr><td>E1楕円 (かご一体)</td><td>E2楕円 (e2p)</td><td>軸間 12 = 2a・焦点軸支で構成的に厳密</td><td>EP14: 0.32mm³ / bite_asm</td><td>✅</td></tr><tr><td>P12T (e2p)</td><td>G12T (軸)</td><td>m1.0・軸間 12.00 = 理論12.00</td><td>EP15: 1.21mm³ / mesh_ret</td><td>✅</td></tr><tr><td>軸ピニオン14T</td><td>W1 64T</td><td>m0.5・軸間 19.75 = 理論19.5+BL0.25</td><td>EP10: 0.74mm³ / P11 0.14受容</td><td>✅</td></tr><tr><td>P1 14T</td><td>W2 64T</td><td>軸間 19.75</td><td>EP11: 0.24mm³ / P12 0mm³</td><td>✅</td></tr><tr><td>P2 14T</td><td>W3 64T</td><td>軸間 19.75</td><td>EP12: 1.01mm³ / P13 0.26受容</td><td>✅</td></tr><tr><td>地下提灯6ピン</td><td>冠環43T (背骨)</td><td>riser 24.5 = 冠環21.5+提灯3.0</td><td>EP13: 0.03mm³ (接線) / PAIR14 0mm³</td><td>✅</td></tr></table>
+<p style="font-size:0.76rem;color:var(--sub);margin-top:0.4rem;">engage = 互いに0.5mm (提灯×冠環のみ接線6°) 寄せた時の重なり体積。
+0でない=「あるべき位置で実際に触れ合う」ことの機械的証明。ピン×溝系は接線方向に寄せるのが正 (溝底非接触は仕様)</p></div>
+
+<div class="card"><h2>Ⅱ. 構造物ごとの接触相手 (噛合以外の25件)</h2>
+<table><tr><th>構造物</th><th>接触相手とはめあい (穴/軸・+すきま/-締め代)</th><th>判定</th></tr><tr><td>中心軸 (真鍮32)</td><td>太陽・軸ピニオン (圧入2.85/-0.15)・床穴 (**fix35: 3.4**)・背骨bore3.6 (意図的逃げ)・coupling/knob (3.25差込)</td><td>✅</td></tr><tr><td>縦シャフト (真鍮9.9)</td><td>W3・提灯 (圧入2.85)・ベース穴 (**fix35: 3.4ジャーナル** — 0.6ガタは噛み深さを食うため)</td><td>✅</td></tr><tr><td>第2軸 (真鍮60)</td><td>腕2+E1スリーブ (ジャーナル3.4/+0.4)・月球/G (3.05瞬着)</td><td>✅</td></tr><tr><td>背骨 (spine)</td><td>浅皿 (r20.2 in 23.0・調芯=軸)・遊星スタッド2 (3.4/+0.4)・柱→プレート→ボス (かご8.6/8.0)・stub→冠傘 (6.15/6.0 すきま+瞬着 — BOMの「圧入」表記を接着に訂正)</td><td>✅</td></tr><tr><td>かごコア</td><td>ボスjournal (+0.6)・プレート上0.1浮き+シム・冠歯→リングピン・E1→e2p</td><td>✅</td></tr><tr><td>リング46</td><td>土手 (溝29.7-31.7×壁30.0-31.4・径遊び0.3・天井載せ)・遊星・下流idler2・ピン→かご冠</td><td>✅</td></tr><tr><td>e2p</td><td>フレームスタッド (3.2/+0.2)・キャップ瞬着</td><td>✅</td></tr><tr><td>サロスセグ×3</td><td>壁上面滑り座 (z2.5)・セグ間ダボ (3.6/3.9)・内歯←提灯</td><td>✅</td></tr><tr><td>天球リング×3</td><td>溝ピン2 (掛かり1.2)+滑り座az20 (15.3+シム)・セグ間ダボ・冠90←st1</td><td>✅</td></tr><tr><td>地平環×3</td><td>柱ピン3 (2.2/2.5 瞬着)・セグ間ダボ</td><td>✅</td></tr><tr><td>各アイドラ/キャリア</td><td>ベーススタッド (3.4/3.0 ジャーナル・丈は部品天面に一致)</td><td>✅</td></tr><tr><td>W1P1・W2P2</td><td>吊りスタッド (3.4/3.0・接着キャップは組立時判断)</td><td>✅</td></tr><tr><td>モーターマウント</td><td>ベース (0,±26) M3×10・28BYJ-48耳 (±17.5)</td><td>✅</td></tr></table>
+<p style="font-size:0.76rem;color:var(--sub);margin-top:0.4rem;">規約: ジャーナル+0.2〜0.4 / 圧入-0.15 / 瞬着+0.05〜0.15 /
+滑り座=紙シム調整前提。全数が規約内であることを定数から再計算で確認</p></div>
+
+<div class="card"><h2>Ⅲ. この監査が守っているもの</h2>
+<table>
+<tr><th>検査</th><th>問い</th><th>捕まえた実バグ</th></tr>
+<tr><td>collide (8角度×3系)</td><td>回る物が固定物にぶつからないか</td><td>fix11-28 の多数</td></tr>
+<tr><td>bite (PAIR2-14 位相走査)</td><td>噛み合う歯が食い込まないか</td><td>fix29/30/31 (潜伏7.4mm³・符号・小歯数)</td></tr>
+<tr><td>シェル (連結成分=1)</td><td>部品が一体として存在するか</td><td>fix33 (8Tの孤島)・fix34 (穴の座標残留)</td></tr>
+<tr><td><b>engage (15ペア・新設)</b></td><td><b>あるべき接触が実在するか</b></td><td>fix35 (ジャーナルのガタ) + 台帳の完成</td></tr>
+</table></div>
+
+<footer style="text-align:center; color:#5a6478; font-size:0.75rem; margin-top:2rem;">
+巡る天の心臓 v0.7 隣接台帳 (2026-08-17) — meguru_v6.scad の定数から全数再計算・CGAL実測<br>
+たまさん × Claude 共作 — 「ぶつからない」と「ちゃんと触れている」は別の検査 🔍</footer>
+</div></body></html>
