@@ -1,4 +1,6 @@
-# 巡る天の心臓 / Meguru — Antikythera × Tourbillon
+# Desktop Antikythera Mechanism — 巡る天の心臓 / Meguru
+
+> A desktop-size descendant of the Antikythera mechanism, with a three-axis tourbillon heart.
 
 2000年前の天文計算機アンティキティラ機構の子孫に、月の秤動・サロス周期・傾く天球、そして
 **18.6年の交点歳差 (誤差 +0.10%)** を仕込んだ真・3軸機構。すべて歯数の整数比から。
@@ -8,7 +10,7 @@ A three-axis tourbillon descendant of the Antikythera mechanism: lunar libration
 tilted ecliptic sphere, and the 18.61-year lunar nodal precession (+0.10% error) — all from
 integer gear ratios. Co-created by a family physician and Claude (AI).
 
-**▶ 解説サイト / Site**: https://tama831.github.io/meguru-ten-no-shinzo/
+**▶ 解説サイト / Site**: https://tama831.github.io/desktop-antikythera-mechanism/
 
 ## 中身 / Contents
 - `meguru_v6.scad` — 全パラメトリック設計 (OpenSCAD)。collide/bite/シェル/engage の検証 PART 込み
