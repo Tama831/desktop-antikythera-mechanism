@@ -19,7 +19,8 @@ ASSUME = {
     'motor_mNm': 20.0,          # 28BYJ-48 の引き込みトルク (公称≥34 だが互換品のばらつきを見て控えめに)
     'g': 9.81,
 }
-STL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stl_v6')
+_HERE = os.path.dirname(os.path.abspath(__file__))
+STL = next((os.path.join(_HERE, d) for d in ('stl_v6', 'stl') if os.path.isdir(os.path.join(_HERE, d))), 'stl')   # 正典=stl_v6 / 公開リポ=stl
 
 
 def cc(name):
