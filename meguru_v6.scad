@@ -109,18 +109,24 @@ SUN_PH = 0; PLNT_PH = 15; CAGE_PH = 7.5;  // 描画位相 (bite で追試・調�
 M_UB = 0.5;                         // 地下層モジュール
 // fix33: 8T/10T は φ3 軸・スタッドに存在できない (歯底円 < 穴半径で胴が消える)。φ3系の最小 ≈13T →
 // 「14T→64T ×3段」に再設計。3段で符号も自然に4反転 (最終の提灯×冠環込み) — アイドラ廃止
-ZB_A = 14; ZB_W = 64; ZB_P = 14;    // 各段: ピニオン14T → ホイール64T (32/7)。W1P1 / W2P2 / W3 の3枚構成
+ZB_A = 14; ZB_W = 64; ZB_P = 14;    // 各段: ピニオン14T → ホイール64T (32/7)。W1P1 / W2P2 の2枚は共用形状
+ZB_W3 = 65;                         // fix36: 最終段だけ 65T — 遊星段の連成込みで交点歳差を天文値に合わせる (下の検算参照)
 RT_T = 43; M_RT = 1;                // ターンテーブル冠環 43T m1 (ピッチ21.5・z3-5 上乗せ)
 LNT_RP2B = M_RT*6/2;                // 提灯ピッチ r3 (6ピン — LANT_PINS はサロス節で後方定義のためリテラル)
-PREC_RATIO = pow(ZB_W/ZB_P, 3)*(RT_T/6);   // (64/14)³·43/6 = 684.66 vs 684=228×3 (誤差+0.10% — 歴代最良)
+PREC_RATIO = pow(ZB_W/ZB_P, 2)*(ZB_W3/ZB_P)*(RT_T/6);   // 軸/ターンテーブル = 695.35
+// 遊星段: ω_軸 = 4ω_tt − 3ω_リング、地下輪列: ω_tt = ω_軸/PR (同符号) → 歳差1周 = リング (PR−4)/3 回 (逆行)
+//   = 230.45 朔望月 vs 天文 230.05 (交点周期6793.5日) → +0.18%
+//   ※fix36 前の「1/684.66・誤差+0.10%」は (a) 天文230でなく設計目標228との比較 (b) 連成の −4 を落としていた。真値は −1.37% だった
 AUTO_PREC = 1;                      // 1: pa が ca に従属 (実機通り)。0: 手回し表示 (旧 v0.6a 挙動)
-UB_CD = M_UB*(ZB_P + ZB_W)/2 + 0.25;   // 段軸間 19.75 (+0.25 バックラッシ — W歯先×ピニオン基礎円のマージン0.11確保)
+UB_CD  = M_UB*(ZB_P + ZB_W)/2 + 0.25;    // 段軸間 19.75 (+0.25 バックラッシ — W歯先×ピニオン基礎円のマージン0.11確保)
+UB_CD3 = M_UB*(ZB_P + ZB_W3)/2 + 0.25;   // 最終段の軸間 20.00
 S1_XY = [0, UB_CD];                 // W1P1 スタッド (az90 — スクリューヘッド(0,±26) とは z で棲み分け)
-S3_XY = [24.5, 0];                  // 縦シャフト = 冠環ピッチ21.5 + 提灯3
-// S2 = |S1-S2|=|S2-S3|=UB_CD の円交点 (軸から遠い側 — W2 が軸を飲まないように)
+S3_XY = [24.5, 0];                  // 縦シャフト = 冠環ピッチ21.5 + 提灯3 (固定 — 冠環側の幾何で決まる)
+// S2 = |S1-S2|=UB_CD・|S2-S3|=UB_CD3 の円交点 (軸から遠い側 — W2 が軸を飲まないように)
 UB_D  = norm(S3_XY - S1_XY);
-UB_H  = sqrt(UB_CD*UB_CD - UB_D*UB_D/4);
-S2_XY = (S1_XY + S3_XY)/2 + UB_H*[-(S3_XY[1]-S1_XY[1]), S3_XY[0]-S1_XY[0]]/UB_D;
+UB_A  = (UB_CD*UB_CD - UB_CD3*UB_CD3 + UB_D*UB_D)/(2*UB_D);
+UB_H  = sqrt(UB_CD*UB_CD - UB_A*UB_A);
+S2_XY = S1_XY + UB_A*(S3_XY - S1_XY)/UB_D + UB_H*[-(S3_XY[1]-S1_XY[1]), S3_XY[0]-S1_XY[0]]/UB_D;
 // 噛合位相の解析解: gear1(位相p1,歯z1) から方位 az の gear2(歯z2) へ「歯↔溝」を渡す
 function mesh_phase(p1, z1, z2, az) =
   let (d1 = ((az - p1) % (360/z1) + 360/z1) % (360/z1))       // gear1 の歯ズレ (噛合線基準)
@@ -128,7 +134,7 @@ function mesh_phase(p1, z1, z2, az) =
 A_PH  = 15;                                                    // 軸ピニオン (太陽と別クロッキングで圧入)
 W1_PH = mesh_phase(A_PH, ZB_A, ZB_W, 90);
 W2_PH = mesh_phase(W1_PH, ZB_P, ZB_W, atan2(S2_XY[1]-S1_XY[1], S2_XY[0]-S1_XY[0]));   // P1はW1と同位相(同体)
-W3_PH = mesh_phase(W2_PH, ZB_P, ZB_W, atan2(S3_XY[1]-S2_XY[1], S3_XY[0]-S2_XY[0]));
+W3_PH = mesh_phase(W2_PH, ZB_P, ZB_W3, atan2(S3_XY[1]-S2_XY[1], S3_XY[0]-S2_XY[0]));
 RT_PH = 180/RT_T;                   // 冠環: pa=0 で az0 (ピン側) に溝
 ENGRAVE = 1;                        // v0.7 銘: 案1「考証オマージュ」採用 (2026-08-16 たまさん選定)。0で無刻印・2/3は比較用に残置
 LNT_PH = 180 - W3_PH;               // 提灯のクロッキング (組立時接着): ca=0 でピン1本が機械中心を向く
@@ -152,6 +158,12 @@ TR_ZT  = 40;       // 傾斜リング中心の高さ (上面基準・傾斜軸�
 TR_RI  = 52; TR_RO = 63; TR_H = 4;   // リング半径帯 (内縁「下角」投影 52·cT-4·sT=46.1 > クランク45.0 ✓ 傾斜ずり込み込み)
 CROWN_N  = 90;     // 冠歯数 (fix23: 76→90 — 主輪19T小径化との組で年周比を保つ)。本家も冠歯車で軸を曲げた
 CROWN_RP = 59;     // 冠ピッチ半径 (面内)。歯体は r57-62.5 — 支柱スイープ(≦52.8)の外 (最悪az180でクリア0.48)
+// fix37 (2026-09-28): PAIR6 の噛み込み 6.1-6.7mm³ の正体は4つの塊 — ①傾いた歯先がピン台座に刺さる (最大)
+// ②ピン先が天球リング底に刺さる ③④ピン側面×歯側面。8位相スイープで決定 → 最悪 0.26mm³ (95%減)・engage 0.34 (噛み合い実在)
+CROWN_TIP_W = 0.5;       // 冠歯の先端幅 (根元1.3 → 先端0.5 の台形・fix27 と同じ手)
+ST1_HUB_DROP = 1.8;      // st1 ピン台座 (ハブ太部天面) を 1.8 下げる — 天球23.4°の傾きでハブ幅10.5の間に歯先高さが~2mm変わる
+ST1_PIN_TOP_CUT = 1.2;   // 提灯ピン先端を 1.2 詰める (先端 z24.9)
+ST1_PIN_D = 1.8;         // 提灯ピン径 2.2→1.8
 CROWN_TL = 3.6;    // 冠歯丈 (下面 -4 から -7.6。4.6は冠歯先が az-28 で z11.5 まで沈み45Tと0.3かぶった — fix18)
 GROOVE_R = 54.4;   // 下面ガイド溝半径 (内壁52.4=内縁+0.4 / 外壁56.4=冠歯-0.6)。幅4.0 (斜行0.67+ピン1.1+遊び)・深さ2.0
 TPIL_AZ  = [150, 215];       // 溝ピン式支柱 (上がり側のみ — 下がり側は冠歯が z10-14 までスイープしピン式が成立しない)
@@ -304,7 +316,7 @@ module base() {
         rotate([0,0,180]) meguru_arc_text("巡る天の心臓", 57, 7);
         rotate([0,0,0])   meguru_arc_text("二〇二六 立秋 たま × Claude 共作", 57, 5, true);
         rotate([0,0,90])  meguru_arc_text("真・三軸トゥールビヨン", 46, 3.8);
-        rotate([0,0,270]) meguru_arc_text("歯車三四枚 誤差 0.10%", 46, 3.8);
+        rotate([0,0,270]) meguru_arc_text("歯車三四枚 誤差 0.18%", 46, 3.8);   // fix36: 0.10% は誤り (設計目標との比較だった)
       }
       if (ENGRAVE == 3) {   // 案3: 次世代への手紙
         rotate([0,0,180]) meguru_arc_text("二千年後のあなたへ —", 57, 6);
@@ -386,8 +398,8 @@ module ub_w1p1() {   // W 64T + P 14T 一体 (吊りスタッドでフリー回�
     translate([0,0,-1]) cylinder(d = AXLE_FIT, h = 4);
   }
 }
-module ub_w3() {     // W3 64T (縦シャフト下端圧入・ak0.7)
-  linear_extrude(height = 1.3) difference() { gear2d(ZB_W, M_UB, 20, 0.7); circle(d = AXLE_PRESS); }
+module ub_w3() {     // W3 65T (縦シャフト下端圧入・ak0.7 — fix36 で 64→65)
+  linear_extrude(height = 1.3) difference() { gear2d(ZB_W3, M_UB, 20, 0.7); circle(d = AXLE_PRESS); }
 }
 module ub_lantern() {   // 提灯: キャリア円盤+6ピン垂下 (縦シャフト上端・LNT_PH クロッキングで接着)。局所 z0 = ピン下端 (空間 z3)
   difference() {
@@ -639,8 +651,10 @@ module tilt_ring() {
         cylinder(r = TR_RO, h = TR_H);
         translate([0,0,-1]) cylinder(r = TR_RI, h = TR_H + 2);
       }
-      for (i = [0:CROWN_N-1]) rotate([0,0,i*360/CROWN_N])
-        translate([CROWN_RP - 2, -0.65, -TR_H - CROWN_TL]) cube([5.5, 1.3, CROWN_TL + 0.2]);  // 冠歯 幅1.3 (N90ピッチ4.12・溝余裕0.6)
+      for (i = [0:CROWN_N-1]) rotate([0,0,i*360/CROWN_N]) hull() {   // 冠歯: 根元1.3 → 先端 CROWN_TIP_W の台形 (fix37 — fix27 と同じ手)
+        translate([CROWN_RP - 2, -0.65, -TR_H - 0.3]) cube([5.5, 1.3, 0.5]);                                  // 根元 (リング底に0.2埋め)
+        translate([CROWN_RP - 2, -CROWN_TIP_W/2, -TR_H - CROWN_TL]) cube([5.5, CROWN_TIP_W, 0.3]);            // 先端
+      }
       translate([57, 0, 0]) cylinder(d = 3, h = 4);            // 太陽の旗竿 (方位0 = 牡羊点)
       translate([57, 0, 5]) sphere(d = 6);                     // 太陽玉 (d6/r57)
     }
@@ -672,9 +686,10 @@ module st1_carrier() {
     union() {
       linear_extrude(height = 2.6) gear2d(Z_ST1A, M_MAIN);          // 19T (v0.6a: 空間 z6.2-8.8 相当)
       translate([0,0,2.6]) cylinder(d = 8.6, h = 4.7);              // ハブ細部 (22T歯先r18と軸間22.5: クリア0.2)
-      translate([0,0,7.3]) cylinder(d = 10.5, h = 9.3);             // ハブ太部 (v0.6a: +3 延長 — 天球は動かないのでピン高度を維持)
+      translate([0,0,7.3]) cylinder(d = 10.5, h = 9.3 - ST1_HUB_DROP);   // ハブ太部 (v0.6a: +3 延長。fix37: 天面を ST1_HUB_DROP 下げる)
       for (i = [0:LANT_PINS-1]) rotate([0,0,i*360/LANT_PINS])
-        translate([CROWN_LRP, 0, 16.6]) cylinder(d = 2.2, h = 3.3); // ピン (空間 z22.8-26.1 — v0.5 と同一高度)
+        translate([CROWN_LRP, 0, 16.6 - ST1_HUB_DROP - 0.2])
+          cylinder(d = ST1_PIN_D, h = 3.3 + ST1_HUB_DROP + 0.2 - ST1_PIN_TOP_CUT);   // ピン (台座に0.2埋め・先端高さは 26.1-CUT)
     }
     translate([0,0,-1]) cylinder(d = AXLE_FIT, h = 30);
   }
@@ -732,14 +747,14 @@ module coupling() {
 // stage (v0.7-B 組立ガイド用): 0=土台 / 1=+地下と背骨 / 2=+心臓 / 3=+大周期 / 4=+電動 (9=全部)
 module assembly(explode = 0, ca = 0, pa = PREC_AZ, stage = 9) {
   e = explode;
-  pae     = pa + (AUTO_PREC != 0 ? -3*ca/PREC_RATIO : 0);   // v0.6b: 歳差は地下輪列で ca に従属 (逆行 1/227.1)
+  pae     = pa + (AUTO_PREC != 0 ? -3*ca/(PREC_RATIO - 4) : 0);   // 歳差は ca に従属。fix36: 遊星段の連成 (−4) を入れた厳密式
   axle_a  = 4*pae - 3*ca + SUN_PH;           // 駆動軸+太陽 (エピサイクリック一般式: pa=0 で -3·ca に退化)
   plnt_a  = 3*ca - 2*pae + PLNT_PH;          // 遊星 (空間角): ω_p = (1+Zs/Zp)ω_c - (Zs/Zp)ω_s
   hca     = ca - pae + CAGE_PH;              // かごコア局所角 (ピン×冠 1:1・歳差方位ぶん差し引き)
   shaft_a = axle_a - SUN_PH;                 // 駆動軸そのものの角 (太陽/軸ピニオンは各自のクロッキングで乗る)
   w1_a    = -shaft_a*ZB_A/ZB_W + W1_PH;      // v0.6b 地下輪列 (fix33: 3段)
   w2_a    = -(w1_a - W1_PH)*ZB_P/ZB_W + W2_PH;
-  w3_a    = -(w2_a - W2_PH)*ZB_P/ZB_W + W3_PH;
+  w3_a    = -(w2_a - W2_PH)*ZB_P/ZB_W3 + W3_PH;
   saros_a = -ca * SAROS_RATIO + SAROSR_PH;   // fix30: fix22 の再訂正 — 内歯噛みは回転方向を保存する
   // (アイドラ(-) → リング(-)。自前の遊星→内歯36と同じ標準則)。符号+だと位相ズレが 2·RATIO·ca で蓄積し、
   // 歯ピッチ整数倍の角度だけ偶然噛む (PAIR3 の ✅/⚠️ パターン8/8がこの式で完全に予言できた = 決定的証拠)。
@@ -821,7 +836,7 @@ module rotating_drive(ca) {
   let (sha = 4*PREC_AZ - 3*ca,
        w1 = -sha*ZB_A/ZB_W + W1_PH,
        w2 = -(w1 - W1_PH)*ZB_P/ZB_W + W2_PH,
-       w3 = -(w2 - W2_PH)*ZB_P/ZB_W + W3_PH) {
+       w3 = -(w2 - W2_PH)*ZB_P/ZB_W3 + W3_PH) {
     translate([0,0,-4.9]) rotate([0,0,sha + A_PH]) ub_pinionA();
     translate([S1_XY[0], S1_XY[1], -4.9]) rotate([0,0,w1]) ub_w1p1();
     translate([S2_XY[0], S2_XY[1], -3.6]) rotate([0,0,w2]) ub_w1p1();
@@ -992,7 +1007,7 @@ else if (PART == "engage")   // v0.7-D 実在検査: 機能噛合ペアを δ=0.
     }
     if (EP == 12) intersection() {  // P2 × W3 (寄せ: W3 を S2 へ)
       translate([S2_XY[0], S2_XY[1], -3.6]) rotate([0,0,W2_PH]) ub_w1p1();
-      translate([S3_XY[0] + SQ*(S2_XY[0]-S3_XY[0])/UB_CD, S3_XY[1] + SQ*(S2_XY[1]-S3_XY[1])/UB_CD, -2.3]) rotate([0,0,W3_PH]) ub_w3();
+      translate([S3_XY[0] + SQ*(S2_XY[0]-S3_XY[0])/UB_CD3, S3_XY[1] + SQ*(S2_XY[1]-S3_XY[1])/UB_CD3, -2.3]) rotate([0,0,W3_PH]) ub_w3();
     }
     if (EP == 13) intersection() {  // 提灯ピン × 冠環43T (寄せ: 提灯を+6°回す=接線0.31mm — ピン×溝は接線接触なので回転寄せが正
       // ※初版は半径寄せで空=偽⚠️だった (溝底非接触は設計仕様)。教訓: engage の寄せ方向は「動力が流れる向き」)
@@ -1082,7 +1097,7 @@ else if (PART == "bite_pair")     // v0.4b-fix16: 噛合ペアの描画位相検
     if (PAIR >= 11) let (sa = ANGLE,
          w1 = -sa*ZB_A/ZB_W + W1_PH,
          w2 = -(w1 - W1_PH)*ZB_P/ZB_W + W2_PH,
-         w3 = -(w2 - W2_PH)*ZB_P/ZB_W + W3_PH) {
+         w3 = -(w2 - W2_PH)*ZB_P/ZB_W3 + W3_PH) {
       if (PAIR == 11) intersection() {                 // 軸ピニオン14 × W1 64 (周期 sa=25.7°)
         translate([0,0,-4.9]) rotate([0,0,sa + A_PH]) ub_pinionA();
         translate([S1_XY[0], S1_XY[1], -4.9]) rotate([0,0,w1]) ub_w1p1();
