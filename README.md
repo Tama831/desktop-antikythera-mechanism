@@ -21,6 +21,8 @@ integer gear ratios. Co-created by a family physician and Claude (AI).
 - `docs/` — 機構解説・組み立ての書・印刷計画書・隣接台帳 (GitHub Pages)
 
 ## 状態 / Status
+> ⚠️ **既知の問題 (2026-09-28)**: 物理チェックで、このままでは組み上がらない箇所 (部品同士の重なり4件・重力で落ちる部品6点) が見つかり、修正中です。修正版が出るまで印刷はお待ちください。 / Known issue: a physics check found parts that would not assemble; a fix is in progress — please don't print yet.
+
 設計・検証フェーズ完了。**実機は未印刷** — 実体化の記録は今後ここに追記します。
 Design & verification complete; **not yet printed**. Build log will follow.
 
