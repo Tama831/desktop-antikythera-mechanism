@@ -161,14 +161,21 @@ CROWN_RP = 59;     // 冠ピッチ半径 (面内)。歯体は r57-62.5 — 支�
 // fix37 (2026-09-28): PAIR6 の噛み込み 6.1-6.7mm³ の正体は4つの塊 — ①傾いた歯先がピン台座に刺さる (最大)
 // ②ピン先が天球リング底に刺さる ③④ピン側面×歯側面。8位相スイープで決定 → 最悪 0.26mm³ (95%減)・engage 0.34 (噛み合い実在)
 CROWN_TIP_W = 0.5;       // 冠歯の先端幅 (根元1.3 → 先端0.5 の台形・fix27 と同じ手)
-ST1_HUB_DROP = 1.8;      // st1 ピン台座 (ハブ太部天面) を 1.8 下げる — 天球23.4°の傾きでハブ幅10.5の間に歯先高さが~2mm変わる
-ST1_PIN_TOP_CUT = 1.2;   // 提灯ピン先端を 1.2 詰める (先端 z24.9)
+ST1_PIN_W = [20.8, 24.9];   // 提灯ピンの空間高さ [根元, 先端] (fix37: 台座を1.8下げ・先端を1.2詰めた結果)
 ST1_PIN_D = 1.8;         // 提灯ピン径 2.2→1.8
+// fix40 (v0.7.2): 地面の高さの引き直し — v0.6a でサロス環 (z2.5-7.5) と同じ高さ帯に冠アイドラ下段・st1 主輪を置いていた
+// (総当たり 42/324mm³)。両方をリング46帯 (z9-13) の上の段 z13.2-15.8 へ上げる (その高さの住人がいないことは総当たりで確認)
+CIDL_Z = 9.0;            // 冠アイドラの置き高さ: 下段22T z9-13 (リング46と) / 上段11T z13.2-15.8 (st1 と)
+ST1_Z  = 13.2;           // st1 の置き高さ: 主輪19T z13.2-15.8
+SHOULDER_D = 5;          // fix41: スタッドの肩 (部品を設計の高さで受ける段) の径
+AXLE_BOT = -14.4;        // fix44: 中心軸の下端 (ノブ/カップリングの D カット差し込み 8mm ぶん)
 CROWN_TL = 3.6;    // 冠歯丈 (下面 -4 から -7.6。4.6は冠歯先が az-28 で z11.5 まで沈み45Tと0.3かぶった — fix18)
 GROOVE_R = 54.4;   // 下面ガイド溝半径 (内壁52.4=内縁+0.4 / 外壁56.4=冠歯-0.6)。幅4.0 (斜行0.67+ピン1.1+遊び)・深さ2.0
 TPIL_AZ  = [150, 215];       // 溝ピン式支柱 (上がり側のみ — 下がり側は冠歯が z10-14 までスイープしピン式が成立しない)
-SEAT_AZ  = 20; SEAT_R = 45;  // 下がり側は滑り座式: リング内縁下面を受ける皿 (r45 = 冠歯スイープ内側48.9 の内)
-SEAT_TOP = 15.3;             // 座上面 (内縁下面 z≈15.7 − 遊び。印刷後に紙シムで当たり調整 — サロス滑り座と同じ文化)
+PIN_GAP = 0.05;          // fix45: 溝ピン先端と溝天井のすき間 (傾いた溝壁に先端の角が触れないように)
+SEAT_AZ  = 20; SEAT_R = 47;  // 下がり側の座 (fix45: 45→47 — リング内縁の縁 (局所r52-52.4) の真下へ。冠歯先の掃く平面r50.1 の内)
+// 天球リングの局所面 z_l より下の空間 (支えの天面をリングの傾いた面に一致させる — fix45)
+module sky_below(z_l) { translate([0,0,TR_ZT]) rotate([0,TILT,0]) translate([-200,-200,z_l - 300]) cube([400,400,300]); }
 // 減速列 (v3・fix23 検品13): かご46 → 2段アイドラ22T/11T → 19T+提灯6 → 冠90
 // ω_ring/ω_cage = (46/22)·(11/19)·(6/90) = 1/12.391 (実際の年 12.368 — 誤差 0.19%)
 // 旧45T (φ70.5) はかごと平面かぶり17.9・サロス被覆83°だった → 19T (φ31.5) でかぶりゼロ・被覆34°
@@ -280,29 +287,41 @@ module base() {
         translate([0,0,-1]) cylinder(r = SAROS_RP - 4, h = H_SAROS + 2);
       }
       rotate([0,0,IDLER_A]) translate([IDLER_R, 0, 0]) cylinder(d = AXLE_D, h = 13);   // v0.6a: 17→13 (idler帯 z-3)
+      rotate([0,0,IDLER_A]) translate([IDLER_R, 0, 0]) cylinder(d = SHOULDER_D, h = H_SAROS + 5.2);   // fix41: 肩 — 中間輪の円盤下面 (z7.7) を受ける (提灯ピン内縁3.5の内側)
       // v0.4b 傾斜天球の3点支持: 上がり側2本 = 溝ピン式 (radial 拘束) / 下がり側1本 = 滑り座式
       for (a = TPIL_AZ) {
         px = GROOVE_R*cos(a)*cos(TILT) - 2.0*sin(TILT);   // 溝底 local z=-2.0 の空間位置
         py = GROOVE_R*sin(a);
         zf = TR_ZT - GROOVE_R*cos(a)*sin(TILT) - TR_H*cos(TILT);   // この方位のリング下面高さ (支柱中心)
-        translate([px, py, 0]) cylinder(d = 5, h = zf - 2.0);      // 頭-2.0 / d5
-        translate([px, py, 0]) cylinder(d = 2.2, h = zf + 1.2);    // ピン (溝掛かり1.2・溝底クリア 中心0.64/縁0.2)
+        translate([px, py, 0]) cylinder(d = 3.8, h = 8.5);         // fix42: サロス環の帯 (z2.5-7.5) は d3.8 — d5 だと az215 で歯先 r54.4 を 0.2 かすめていた
+        translate([px, py, 8.5]) cylinder(d = 5, h = zf - 2.0 - 8.5);   // 頭-2.0 / d5
+        intersection() {   // ピン: fix45 — 先端を溝天井の傾いた面に合わせて削り出す (旧: 溝天井まで0.2-0.6浮いていた)
+          translate([px, py, 0]) cylinder(d = 2.2, h = zf + 4);
+          sky_below(-2.0 - PIN_GAP);
+        }
       }
-      rotate([0,0,SEAT_AZ]) translate([SEAT_R, 0, 0]) cylinder(d = 5, h = SEAT_TOP);   // 滑り座 (内縁下面を受ける皿)
+      // fix45: 3点目の座 — 旧 (d5・r45・天面15.3 平ら) はリング内縁下面まで ~1.2 浮いていて実質2点支持だった
+      // (リングが +x 側へ傾き st1 の提灯ピンに体重を預けて噛み込む)。天面をリング下面の傾いた面に合わせて削り出す
+      intersection() { rotate([0,0,SEAT_AZ]) translate([SEAT_R, 0, 0]) cylinder(d = 4, h = 30); sky_below(-TR_H); }
       // (v0.6a) 天球キャリア/2段アイドラ スタッドは下の union 継続部で丈調整
       // v0.5-B 地平環の柱3本 (r43.5 — 天球内縁下角投影46.1の内側/冠歯スイープ48.9の内側。先端ピンで環を受ける)
       for (a = [30, 150, 215]) rotate([0,0,a]) translate([43.5, 0, 0]) {
         cylinder(d = 4, h = 70);
         translate([0,0,70]) cylinder(d = 2.2, h = 2.5);
       }
-      translate([ST1_XY[0], ST1_XY[1], 0]) cylinder(d = AXLE_D, h = 18);     // 天球キャリア スタッド (h18 — 冠歯外端の下角スイープz19.7を回避)
-      translate([CIDL_XY[0], CIDL_XY[1], 0]) cylinder(d = AXLE_D, h = 13);   // 2段アイドラ スタッド (v0.6a: 15→13, 部品天面13に合わせ)
+      // fix40: st1 のスタッドは r53.5 でサロス環の歯先 r54.4 に 0.6 食い込む位置を貫いていた → 環の内側の柱から腕木で受ける
+      st1_bracket();
+      translate([CIDL_XY[0], CIDL_XY[1], 0]) cylinder(d = AXLE_D, h = CIDL_Z + 7);           // 冠アイドラ スタッド (fix40: 部品天面15.8+)
+      translate([CIDL_XY[0], CIDL_XY[1], 0]) cylinder(d = SHOULDER_D, h = CIDL_Z);         // fix41: 肩 — 冠アイドラを z9 で受ける
       // v0.6b 地下輪列の吊りスタッド (fix33: 3段構成・ベース裏)
-      translate([S1_XY[0], S1_XY[1], -4.9]) cylinder(d = AXLE_D, h = 4.9);   // W1P1 用 (z-4.9..0)
-      translate([S2_XY[0], S2_XY[1], -3.7]) cylinder(d = AXLE_D, h = 3.7);   // W2P2 用 (z-3.7..0 — W1天面-3.6の0.1下…W1P1と干渉しない丈)
+      translate([S1_XY[0], S1_XY[1], -6.0]) cylinder(d = AXLE_D, h = 6.0);   // W1P1 用 (fix41: 下へ1.1延長 — 端に軸端キャップ z-6.0..-5.0)
+      translate([S2_XY[0], S2_XY[1], -4.7]) cylinder(d = AXLE_D, h = 4.7);   // W2P2 用 (fix41: 下へ1.0延長 — 端に軸端キャップ z-4.7..-3.7)
       // ブリッジ支柱座は v0.4b で退避 / クランク軸座・穴は v0.6a で退避 (入力は中心軸へ一本化)
     }
     translate([0,0,1]) cylinder(r = 23.0, h = 2.01);         // 中央浅皿 (fix28→v0.6b: 23.0 — 冠環歯先22.5の逃げ。調芯は中心軸が担う)
+    // fix39 (v0.7.2): サロス環の座溝 — v0.6a で H_SAROS 4→2.5 にした時、環の底が板の上面 z3 より 0.5 下に沈んでいた
+    // (総当たり検査で 2566mm³)。溝の底 = 環の座 (z2.5)、内外壁が環を径方向にも受ける
+    translate([0,0,H_SAROS]) difference() { cylinder(r = SAROS_RO + 0.5, h = 3); translate([0,0,-1]) cylinder(r = 54.0, h = 5); }
     // v0.7 隠し刻印 (ベース裏 z0 面へ深さ0.8。帯 r45-65 = 裏スタッド/ネジ/縦シャフト穴の外)
     if (ENGRAVE > 0) mirror([1,0,0]) translate([0,0,-0.01]) linear_extrude(height = 0.81) {
       // 方位規約 (ミラー後のビュー基準): pre180=上 / pre0=下(flip) / pre90=右 / pre270=左
@@ -356,8 +375,22 @@ module ring46() {
 }
 
 // 太陽12T (駆動軸 z9-13 に圧入) / 遊星12T×2 (ターンテーブル上スタッド r18・フリー回転, 先端キャップ瞬着)
-module sun_gear()    { gear(Z_SUN,  M_MAIN, h = GEAR_H, bore = AXLE_PRESS); }
+module sun_gear() {   // fix41: 下へハブ d6 を伸ばし、ターンテーブル上面 z3 に載せて中心軸ごと受ける (無いと手回し時に 6mm 落ちて遊星と外れる)
+  gear(Z_SUN, M_MAIN, h = GEAR_H, bore = AXLE_PRESS);
+  translate([0,0,-5.95]) difference() { cylinder(d = 6, h = 6.15); translate([0,0,-1]) cylinder(d = AXLE_PRESS, h = 8); }   // 局所 -5.95 = 空間 z3.05
+}
+// fix41: 地下の吊りスタッド端のキャップ (stud_cap を流用・瞬着) — 無いと W1P1/W2P2 が下へ抜け落ちる
+module ub_caps() { translate([S1_XY[0], S1_XY[1], -6.0]) stud_cap(); translate([S2_XY[0], S2_XY[1], -4.7]) stud_cap(); }
 module planet_gear() { gear(Z_PLNT, M_MAIN, h = GEAR_H, bore = AXLE_FIT); }
+
+// fix40: st1 の腕木 — 環の内側 (r50・st1 方位+5°) に柱を立て、サロス環の上 (z7.8-8.8) を腕木で渡し、肩で st1 を z13.2 に受ける
+module st1_bracket() {
+  P = 50*[cos(ST1_AZI + 5), sin(ST1_AZI + 5)];
+  translate([P[0], P[1], 0]) cylinder(d = 5, h = 8.8);                                        // 柱 (r47.5-52.5 < 環の歯先54.4)
+  hull() { translate([P[0], P[1], 7.8]) cylinder(d = 5, h = 1); translate([ST1_XY[0], ST1_XY[1], 7.8]) cylinder(d = 5, h = 1); }   // 腕木 (環の天面7.5の0.3上・冠アイドラ22T下面9の0.2下)
+  translate([ST1_XY[0], ST1_XY[1], 7.8]) cylinder(d = SHOULDER_D, h = ST1_Z - 7.8);         // 肩 (st1 を z13.2 で受ける)
+  translate([ST1_XY[0], ST1_XY[1], 7.8]) cylinder(d = AXLE_D, h = ST1_Z + 6 - 7.8);          // スタッド (st1 ハブ内 z19.2 まで)
+}
 
 // 背骨 (spine): ターンテーブル小円盤 + 冠環43T + 遊星スタッド2本 + 傾斜柱2本 + 傾斜プレート+ボス — 一体印刷。
 //   この部品の回転 (方位 pa) = 歳差。柱 (az±90) と遊星スタッド (az0/180) は同体なので永久に非干渉。
@@ -371,14 +404,19 @@ module spine(collar = true) {
   difference() {
     union() {
       translate([0,0,1]) cylinder(r = TT_R, h = 2);                            // ターンテーブル (浅皿内 z1-3)
-      for (a = [0, 180]) rotate([0,0,a]) translate([PLNT_R, 0, 1])
+      for (a = [0, 180]) rotate([0,0,a]) translate([PLNT_R, 0, 1]) {
         cylinder(d = AXLE_D, h = 12.2);                                        // 遊星スタッド (z3-13.2・根元は円盤に埋め)
+        cylinder(d = SHOULDER_D, h = 8);                                       // fix41: 肩 — 遊星を z9 で受ける (無いと 6mm 落ちて噛み外れ)
+      }
       for (s = [-1, 1])
         translate([pil_top[0] - pil_len*sin(PREC_TILT), s*PIL_Y, 3])
           rotate([0, PREC_TILT, 0]) linear_extrude(height = pil_len + 0.5)
             scale([1.4, 1]) circle(d = 5);                                     // 傾斜柱 (リブ楕円 7×5・長軸=傾斜面内)
       translate([0,0,PREC_Z]) rotate([0, PREC_TILT, 0]) {
-        translate([0,0,10]) cylinder(r = PLATE_R, h = 1.9);                    // 傾斜プレート (局所 z10-11.9 — かごハブ下面12と0.1浮き・紙シム着座)
+        intersection() {   // 傾斜プレート (局所 z10-11.9 — かごハブ下面12と0.1浮き・紙シム着座)
+          translate([0,0,10]) cylinder(r = PLATE_R, h = 1.9);
+          translate([-PLATE_R - 1, -PLATE_R - 1, 9]) cube([PLATE_R + 1 + 4.9, 2*PLATE_R + 2, 4]);   // fix43: 局所 x>4.9 を切り欠き
+        }   // 低い側 (+x) の縁が遊星の真上 z13.7 に張り出し、遊星をスタッドへ下ろせなかった (空間 x<7.3 に収める)
         translate([0,0,10]) cylinder(d = 8, h = BOSS_TOP - 10);                // ボス (かごコア ジャーナル・局所 z10-31)
         translate([0,0,BOSS_TOP]) cylinder(d = 6, h = 2);                      // 冠傘圧入段 (bevel_sun 用・v0.5 と同一界面)
       }
@@ -668,12 +706,12 @@ module tilt_ring() {
 
 // 2段アイドラ 22T/11T (fix23): 下段11T(z9.2-11.8)が主輪19Tと、上段22T(z12-16)がかご46Tと噛む。
 // z9.2-11.8 は「サロス上面9とかご46T下面12の間」の空き帯 — かご台座/アーム掃引帯(z16-35)を避ける
-module crown_idler() {
+module crown_idler() {   // fix40: 上下入れ替え — 下段22T (局所0-4 = 空間9-13) / 上段11T (局所4.2-6.8 = 空間13.2-15.8)
   difference() {
     union() {
-      linear_extrude(height = 2.6) gear2d(Z_CIDLB, M_MAIN);
-      translate([0,0,2.6]) cylinder(d = 8, h = 0.2);
-      translate([0,0,2.8]) linear_extrude(height = GEAR_H) gear2d(Z_CIDLA, M_MAIN);
+      linear_extrude(height = GEAR_H) gear2d(Z_CIDLA, M_MAIN);
+      translate([0,0,GEAR_H]) cylinder(d = 8, h = 0.2);
+      translate([0,0,GEAR_H + 0.2]) linear_extrude(height = 2.6) gear2d(Z_CIDLB, M_MAIN);
     }
     translate([0,0,-1]) cylinder(d = AXLE_FIT, h = 9);
   }
@@ -681,15 +719,14 @@ module crown_idler() {
 
 // 天球キャリア (fix23): 主輪19T (z9.2-11.8・アイドラ11Tと噛む) + ハブ筒 d10.5 + 提灯6ピン (冠歯90へ)
 // 19T 内端37.7 > かご歯先36 = 平面かぶりゼロ。ピン (z22.8-26.1・噛み3.0) をハブ筒で冠歯 (az-65帯) へ
-module st1_carrier() {
+module st1_carrier() {   // fix40: 主輪を z13.2 へ上げた (局所0 = 空間 ST1_Z)。ピンの空間高さは ST1_PIN_W のまま
+  pin0 = ST1_PIN_W[0] - ST1_Z;
   difference() {
     union() {
-      linear_extrude(height = 2.6) gear2d(Z_ST1A, M_MAIN);          // 19T (v0.6a: 空間 z6.2-8.8 相当)
-      translate([0,0,2.6]) cylinder(d = 8.6, h = 4.7);              // ハブ細部 (22T歯先r18と軸間22.5: クリア0.2)
-      translate([0,0,7.3]) cylinder(d = 10.5, h = 9.3 - ST1_HUB_DROP);   // ハブ太部 (v0.6a: +3 延長。fix37: 天面を ST1_HUB_DROP 下げる)
+      linear_extrude(height = 2.6) gear2d(Z_ST1A, M_MAIN);          // 19T (空間 z13.2-15.8 — 冠アイドラ上段11Tと)
+      translate([0,0,2.6]) cylinder(d = 10.5, h = pin0 + 0.2 - 2.6); // ハブ (空間 15.8-21.0・ピン台座)
       for (i = [0:LANT_PINS-1]) rotate([0,0,i*360/LANT_PINS])
-        translate([CROWN_LRP, 0, 16.6 - ST1_HUB_DROP - 0.2])
-          cylinder(d = ST1_PIN_D, h = 3.3 + ST1_HUB_DROP + 0.2 - ST1_PIN_TOP_CUT);   // ピン (台座に0.2埋め・先端高さは 26.1-CUT)
+        translate([CROWN_LRP, 0, pin0]) cylinder(d = ST1_PIN_D, h = ST1_PIN_W[1] - ST1_PIN_W[0]);   // ピン (台座に0.2埋め)
     }
     translate([0,0,-1]) cylinder(d = AXLE_FIT, h = 30);
   }
@@ -709,14 +746,16 @@ module motor_mount() {
   }
 }
 // 手回しノブ (fix24): モーターを使わない時、coupling の代わりに裏から差す。軸受けは coupling と同じ d3.25 差し込み
-module hand_knob() {
+// fix44: 真鍮φ3 の下端 8mm を D カット (中心から1.0の平面) にして受ける穴。clr<0 で軽圧入 (旧版は丸穴に丸軸で空転した)
+module d_socket(clr) { intersection() { circle(d = 3.0 + 2*clr); translate([-2, -2]) square([2 + 1.0 + clr, 4]); } }
+module hand_knob() {   // 上面 = 空間 z-6.4 (ピニオンA の 1.5 下)。D カット差し込み深さ8・軽圧入 (抜き差し可)
   difference() {
     union() {
       cylinder(d = 30, h = 5);                                   // 握り円盤 (縁ローレット)
       for (i = [0:11]) rotate([0,0,i*30]) translate([15, 0, 0]) cylinder(d = 3, h = 5);
       translate([0,0,5]) cylinder(d = 10, h = 10);               // 軸受け筒
     }
-    translate([0,0,6]) cylinder(d = 3.25, h = 10);               // 真鍮軸差し込み (抜き差し式)
+    translate([0,0,7]) linear_extrude(height = 9) d_socket(-0.05);
   }
 }
 
@@ -738,7 +777,7 @@ module coupling() {
     cylinder(d = 10, h = 16);
     translate([0,0,-1]) linear_extrude(height = 9)
       difference() { circle(d = 5.2); translate([1.5, -3]) square([3, 6]); }
-    translate([0,0,8]) cylinder(d = 3.25, h = 9);
+    translate([0,0,8]) linear_extrude(height = 9) d_socket(0.05);   // fix44: D カット (旧: 丸穴で空転)
   }
 }
 
@@ -767,18 +806,20 @@ module assembly(explode = 0, ca = 0, pa = PREC_AZ, stage = 9) {
   cidl_a  = -ca * Z_CAGE / Z_CIDLA + CIDL_PH;
   st1_a   = ca * (Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH;
 
-  if (stage >= 1) color("#d8c690") translate([0, 0, -19 - e*2]) cylinder(d = AXLE_D, h = 32);   // 中心駆動軸 (真鍮32mm z-19..13)
+  if (stage >= 1) color("#d8c690") translate([0, 0, AXLE_BOT - e*2]) cylinder(d = AXLE_D, h = 13 - AXLE_BOT);   // fix44: 真鍮 27.4mm (下端8mm D カット)
+  if (stage >= 1) color("#8a7020") translate([0, 0, -e*1.5]) ub_caps();
+  if (stage >= 1) color("#666e7e") translate([0, 0, AXLE_BOT - 7 - e*3]) rotate([0,0,axle_a]) hand_knob();   // 中心駆動軸 (真鍮32mm z-19..13)
   color("#8a7020") base();
-  if (stage >= 4) color("#666e7e") translate([0, 0, -21 - e*2]) coupling();
-  if (stage >= 4) color("#4a5568") translate([0, 0, -5 - e*1.5]) rotate([0,0,90]) rotate([180,0,0]) motor_mount();   // fix33: 1mm下げ・取付穴 y±26
+  // モーター台+カップリングは退避 (v0.7.2): 28BYJ-48 はシャフトが胴体中心から8mmずれ、上下の積み方も寸法と合っていなかった
+  // (v0.2 以来・モーターの形が図面に無く検査に映らなかった)。「置き方 (脚/台座)」と一体で作り直す — Part B
   if (stage >= 3) color("#8a7020") translate([0, 0, 70 + e*5]) horizon_ring();   // v0.5-B 地平環 (柱先端ピンに瞬着)
   if (stage >= 3) color("#6b5a1a") rotate([0,0,saros_a]) for (k = [0:2]) rotate([0,0,k*120])
     translate([0,0,H_SAROS + e*0.5]) saros_seg(k);
   if (stage >= 3) color("#aab4c4") rotate([0,0,IDLER_A]) translate([IDLER_R, 0, H_SAROS + e*0.8])
     rotate([0,0,idler_a]) saros_idler();
   if (stage >= 3) color("#c9a227") translate([0, 0, TR_ZT + e*4]) rotate([0,TILT,0]) rotate([0,0,ring_a]) tilt_ring();
-  if (stage >= 3) color("#aab4c4") translate([CIDL_XY[0], CIDL_XY[1], 6.2 + e*0.8]) rotate([0,0,cidl_a]) crown_idler();
-  if (stage >= 3) color("#8fa88f") translate([ST1_XY[0], ST1_XY[1], 6.2 + e*1.2]) rotate([0,0,st1_a]) st1_carrier();
+  if (stage >= 3) color("#aab4c4") translate([CIDL_XY[0], CIDL_XY[1], CIDL_Z + e*0.8]) rotate([0,0,cidl_a]) crown_idler();
+  if (stage >= 3) color("#8fa88f") translate([ST1_XY[0], ST1_XY[1], ST1_Z + e*1.2]) rotate([0,0,st1_a]) st1_carrier();
   // v0.6a 駆動列: 太陽12T → 遊星12T×2 (背骨キャリア上) → 複合リング46/36 → 下流+ピン×冠
   if (stage >= 1) {
   color("#b8a76a") translate([0, 0, 9 + e*0.5]) rotate([0,0,axle_a]) sun_gear();
@@ -867,8 +908,8 @@ module rotating_heart(ca, pa = PREC_AZ) {
 // v0.4b 天球系 (かご角に従動する独立回転体 — かご回転の外で各自の軸まわりに回る)
 module rotating_sky(ca) {
   translate([0, 0, TR_ZT]) rotate([0,TILT,0]) rotate([0,0, ca * RING_RATIO + RING_PH]) tilt_ring();
-  translate([CIDL_XY[0], CIDL_XY[1], 6.2]) rotate([0,0, -ca * Z_CAGE / Z_CIDLA + CIDL_PH]) crown_idler();
-  translate([ST1_XY[0], ST1_XY[1], 6.2]) rotate([0,0, ca * (Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
+  translate([CIDL_XY[0], CIDL_XY[1], CIDL_Z]) rotate([0,0, -ca * Z_CAGE / Z_CIDLA + CIDL_PH]) crown_idler();
+  translate([ST1_XY[0], ST1_XY[1], ST1_Z]) rotate([0,0, ca * (Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
 }
 module fixed_noncontact() {
   base();
@@ -881,8 +922,9 @@ module fixed_noncontact() {
   }
   translate([0, 0, 70]) horizon_ring();   // v0.5-B: 地平環は fixed (柱は base 内)
   // 中心駆動軸: 圧入区間 (太陽 z9-13 / 軸ピニオン z-4.9..-3.4) を除いた2分割 (回転対称なので固定側で可)
-  translate([0, 0, -19]) cylinder(d = AXLE_D, h = 13.6);       // z-19..-5.4
-  translate([0, 0, -2.9]) cylinder(d = AXLE_D, h = 11.4);      // z-2.9..8.5
+  translate([0, 0, AXLE_BOT]) cylinder(d = AXLE_D, h = -5.4 - AXLE_BOT);   // z-14.4..-5.4
+  ub_caps();
+  translate([0, 0, -2.9]) cylinder(d = AXLE_D, h = 5.9);       // z-2.9..3.0 (v0.7.2: 太陽の下ハブ z3.05-13 は圧入区間 = 同一剛体なので除外)
   translate([S3_XY[0], S3_XY[1], -0.5]) cylinder(d = AXLE_D, h = 3.5);   // 縦シャフト (W3/提灯の圧入区間を除いた中間部)
 }
 
@@ -899,6 +941,7 @@ else if (PART == "ell_test") ell_gear(0, 3.2);
 else if (PART == "tilt_ring") tilt_ring();
 else if (PART == "crown_idler") crown_idler();
 else if (PART == "st1_carrier") st1_carrier();
+else if (PART == "none") { }   // 他の .scad から include して部品モジュールだけ使うとき用 (末尾の else=全体組立を描かない)
 else if (PART == "ring46") ring46();
 else if (PART == "sun_gear") sun_gear();
 else if (PART == "planet_gear") planet_gear();
@@ -979,14 +1022,14 @@ else if (PART == "engage")   // v0.7-D 実在検査: 機能噛合ペアを δ=0.
     }
     if (EP == 5) intersection() {   // リング46 × 冠アイドラ22T
       translate([0,0,9]) ring46();
-      translate([CIDL_XY[0]*(1-SQ/norm(CIDL_XY)), CIDL_XY[1]*(1-SQ/norm(CIDL_XY)), 6.2]) rotate([0,0,CIDL_PH]) crown_idler();
+      translate([CIDL_XY[0]*(1-SQ/norm(CIDL_XY)), CIDL_XY[1]*(1-SQ/norm(CIDL_XY)), CIDL_Z]) rotate([0,0,CIDL_PH]) crown_idler();
     }
     if (EP == 6) intersection() {   // 冠アイドラ11T × st1 19T (寄せ: st1 を cidl へ)
-      translate([CIDL_XY[0], CIDL_XY[1], 6.2]) rotate([0,0,CIDL_PH]) crown_idler();
-      translate([ST1_XY[0] + SQ*(CIDL_XY[0]-ST1_XY[0])/norm(CIDL_XY-ST1_XY), ST1_XY[1] + SQ*(CIDL_XY[1]-ST1_XY[1])/norm(CIDL_XY-ST1_XY), 6.2]) rotate([0,0,ST1_PH]) st1_carrier();
+      translate([CIDL_XY[0], CIDL_XY[1], CIDL_Z]) rotate([0,0,CIDL_PH]) crown_idler();
+      translate([ST1_XY[0] + SQ*(CIDL_XY[0]-ST1_XY[0])/norm(CIDL_XY-ST1_XY), ST1_XY[1] + SQ*(CIDL_XY[1]-ST1_XY[1])/norm(CIDL_XY-ST1_XY), ST1_Z]) rotate([0,0,ST1_PH]) st1_carrier();
     }
     if (EP == 7) intersection() {   // st1 提灯ピン × 天球冠歯90 (寄せ: 天球を 0.5 下げ)
-      translate([ST1_XY[0], ST1_XY[1], 6.2]) rotate([0,0,ST1_PH]) st1_carrier();
+      translate([ST1_XY[0], ST1_XY[1], ST1_Z]) rotate([0,0,ST1_PH]) st1_carrier();
       translate([0, 0, TR_ZT - SQ]) rotate([0,TILT,0]) rotate([0,0,RING_PH]) tilt_ring();
     }
     if (EP == 8) intersection() {   // リング上面ピン24 × かご冠歯24 (寄せ: 心臓を 0.5 沈める)
@@ -1067,19 +1110,19 @@ else if (PART == "bite_pair")     // v0.4b-fix16: 噛合ペアの描画位相検
     }
     if (PAIR == 4) intersection() {                    // リング46 × 冠アイドラ下段11T (v0.6a: かご→リング)
       translate([0,0,9]) rotate([0,0,ca]) ring46();
-      translate([CIDL_XY[0], CIDL_XY[1], 6.2]) rotate([0,0, -ca*Z_CAGE/Z_CIDLA + CIDL_PH]) crown_idler();
+      translate([CIDL_XY[0], CIDL_XY[1], CIDL_Z]) rotate([0,0, -ca*Z_CAGE/Z_CIDLA + CIDL_PH]) crown_idler();
     }
     if (PAIR == 5) intersection() {                    // 冠アイドラ上段22T × 19T
-      translate([CIDL_XY[0], CIDL_XY[1], 6.2]) rotate([0,0, -ca*Z_CAGE/Z_CIDLA + CIDL_PH]) crown_idler();
-      translate([ST1_XY[0], ST1_XY[1], 6.2]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
+      translate([CIDL_XY[0], CIDL_XY[1], CIDL_Z]) rotate([0,0, -ca*Z_CAGE/Z_CIDLA + CIDL_PH]) crown_idler();
+      translate([ST1_XY[0], ST1_XY[1], ST1_Z]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
     }
     if (PAIR == 6) intersection() {                    // 天球提灯6ピン × 冠歯90
-      translate([ST1_XY[0], ST1_XY[1], 6.2]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
+      translate([ST1_XY[0], ST1_XY[1], ST1_Z]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
       translate([0, 0, TR_ZT]) rotate([0,TILT,0]) rotate([0,0, ca*RING_RATIO + RING_PH]) tilt_ring();
     }
     if (PAIR == 7) intersection() {                    // 心臓部全体 × 天球キャリア (傾き込み掃引の検査)
       rotating_heart(ca);
-      translate([ST1_XY[0], ST1_XY[1], 6.2]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
+      translate([ST1_XY[0], ST1_XY[1], ST1_Z]) rotate([0,0, ca*(Z_CAGE/Z_CIDLA)*(Z_CIDLB/Z_ST1A) + ST1_PH]) st1_carrier();
     }
     if (PAIR == 8) intersection() {                    // v0.6a: 太陽12T × 遊星12T (pa=0)
       translate([0,0,9]) rotate([0,0, ca/RING46_RATIO + SUN_PH]) sun_gear();

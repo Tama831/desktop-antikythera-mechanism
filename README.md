@@ -16,12 +16,14 @@ integer gear ratios. Co-created by a family physician and Claude (AI).
 - `meguru_v6.scad` — 全パラメトリック設計 (OpenSCAD)。collide/bite/シェル/engage の検証 PART 込み
 - `stl/` — 印刷部品 33ファイル (Phrozen Sonic Mini 4K 想定・タフレジン推奨)
 - `BOM.md` — 部品表・輪列仕様・組立手順
-- `mesh-verification.md` — 修正38件の検証履歴 (検査の四点測量の記録)
+- `mesh-verification.md` — 修正45件の検証履歴 (検査の四点測量の記録)
 - `verify_v7.sh` / `stl_solid.py` / `stl_vol.py` — 全数検証の台本 (OpenSCAD Manifold バックエンド・数分)
+- `pairwise.sh` / `pairwise.scad` — 総当たり (回るもの同士の非噛合) と重力 (支えの有無) の検査 / `physics_check.py` — トルクと浮きの机上計算
 - `docs/` — 機構解説・組み立ての書・印刷計画書・隣接台帳 (GitHub Pages)
 
 ## 状態 / Status
-> ⚠️ **既知の問題 (2026-09-28)**: 物理チェックで、このままでは組み上がらない箇所 (部品同士の重なり4件・重力で落ちる部品6点) が見つかり、修正中です。修正版が出るまで印刷はお待ちください。 / Known issue: a physics check found parts that would not assemble; a fix is in progress — please don't print yet.
+> ✅ **物理チェックの修正済み (v0.7.2, 2026-09-28)**: 組み上がらない箇所 (部品同士の重なり・重力で落ちる部品・空転するノブ・傾く天球) を修正し、総当たりと重力の検査 (`pairwise.sh`) を加えました。**未完: 置き方 (脚/台座) とモーター台は作り直し中** — 手回しで動かす設計は検証済み、実機は未印刷です。
+> Physics fixes done (v0.7.2). Still pending: the stand and the motor mount. Hand-cranked design is verified; not yet printed.
 
 設計・検証フェーズ完了。**実機は未印刷** — 実体化の記録は今後ここに追記します。
 Design & verification complete; **not yet printed**. Build log will follow.
