@@ -14,16 +14,17 @@ integer gear ratios. Co-created by a family physician and Claude (AI).
 
 ## 中身 / Contents
 - `meguru_v6.scad` — 全パラメトリック設計 (OpenSCAD)。collide/bite/シェル/engage の検証 PART 込み
-- `stl/` — 印刷部品 33ファイル (Phrozen Sonic Mini 4K 想定・タフレジン推奨)
+- `stl/` — 印刷部品 38ファイル・48個 (Phrozen Sonic Mini 4K 想定・タフレジン推奨)
 - `BOM.md` — 部品表・輪列仕様・組立手順
 - `mesh-verification.md` — 修正45件の検証履歴 (検査の四点測量の記録)
 - `verify_v7.sh` / `stl_solid.py` / `stl_vol.py` — 全数検証の台本 (OpenSCAD Manifold バックエンド・数分)
-- `pairwise.sh` / `pairwise.scad` — 総当たり (回るもの同士の非噛合) と重力 (支えの有無) の検査 / `physics_check.py` — トルクと浮きの机上計算
+- `pairwise.sh` / `pairwise.scad` — 総当たり (20剛体・手回し/モーターの2モード)・重力 (支えの有無)・付け替え経路 (モーターの揺りかごを前へ滑らせる掃引) の検査 / `physics_check.py` — トルク・浮き・倒れにくさ (`--tip`) の机上計算
+- `stands.scad` — 置き方の触れる比較で選ばなかった案 (A 三つ足 / C 台座ドラム) の記録
 - `docs/` — 機構解説・組み立ての書・印刷計画書・隣接台帳 (GitHub Pages)
 
 ## 状態 / Status
-> ✅ **物理チェックの修正済み (v0.7.2, 2026-09-28)**: 組み上がらない箇所 (部品同士の重なり・重力で落ちる部品・空転するノブ・傾く天球) を修正し、総当たりと重力の検査 (`pairwise.sh`) を加えました。**未完: 置き方 (脚/台座) とモーター台は作り直し中** — 手回しで動かす設計は検証済み、実機は未印刷です。
-> Physics fixes done (v0.7.2). Still pending: the stand and the motor mount. Hand-cranked design is verified; not yet printed.
+> ✅ **置き方とモーターの揺りかごまで設計・検証済み (v0.7.3, 2026-09-28)**: アーミラリーの三脚+足輪で立ち (倒れ始める傾き 56°)、モーターは揺りかごを前から滑り込ませてノブの下面の横溝に軸を差す (工具なしで手回しと付け替え)。物理チェックで見つかった組み上がらない箇所も修正済み (v0.7.2)。**実機は未印刷**です。
+> Designed and verified through v0.7.3: an armillary-style tripod with a foot ring (tips over only past 56°), and a motor cradle that slides in from the front so the stepper shaft enters a slot under the hand knob (swap between hand and motor without tools). Not yet printed.
 
 設計・検証フェーズ完了。**実機は未印刷** — 実体化の記録は今後ここに追記します。
 Design & verification complete; **not yet printed**. Build log will follow.
@@ -32,7 +33,7 @@ Design & verification complete; **not yet printed**. Build log will follow.
 - 検証コマンド (BOM/検証台帳内) は OpenSCAD CLI + Python3 が前提 (`openscad`, `python3` in PATH)
 - `verify_v7.sh` は **Manifold バックエンド付きの OpenSCAD** (2025年以降の開発版/リリース) が前提。旧 CGAL 専用版では `--backend` が無い
 - 印刷パラメータは光造形 XY 35µm クラス想定。FDM では小歯 (m0.5) と提灯ピン d1.6 の再現が困難です
-- 真鍮丸棒 φ3 (60/32/9.9mm)・28BYJ-48・M3×10 等の非印刷部品は BOM.md 参照
+- 真鍮丸棒 φ3 (60/27.4/9.9mm)・28BYJ-48・M3 ローレットねじ/皿ねじ 等の非印刷部品は BOM.md 参照
 
 ## License
 MIT

@@ -86,5 +86,41 @@ def main():
     print(f'  詰まり時 (モーター全力): 天球の冠歯に {ft_jam:.1f} N → 持ち上げ最大 {lift_jam*1000:.0f} mN / 重さ {W["sky"]*1000:.0f} mN')
 
 
+def tipping(asm_stl, motor=False, stand_h=48.0, r_foot=82.0, motor_g=35.0):
+    """置き方の倒れにくさ (v0.7.3)。組立 STL の体積重心から、床からの重心高さと倒れ始める傾きを出す。
+
+    組立 STL は全部を樹脂として数えるので、モーター時は 28BYJ-48 の形 (胴 d28×19 + 配線カバー) の樹脂換算を
+    実重量 motor_g に差し替える。真鍮軸 (計 ~2cc) は樹脂のまま (重心への影響は 1mm 未満)。
+    組立 STL の作り方: openscad --backend=Manifold -D 'PART="assembly"' -D MOTOR_MODE=0|1 -o asm.stl meguru_v6.scad
+    """
+    V = cx = cy = cz = 0.0
+    for a, b, c in load(asm_stl):
+        v = (a[0]*(b[1]*c[2]-b[2]*c[1]) - a[1]*(b[0]*c[2]-b[2]*c[0]) + a[2]*(b[0]*c[1]-b[1]*c[0])) / 6
+        V += v
+        cx += v*(a[0]+b[0]+c[0])/4
+        cy += v*(a[1]+b[1]+c[1])/4
+        cz += v*(a[2]+b[2]+c[2])/4
+    m = V/1000*ASSUME['resin_g_per_cc']
+    x, y, z = cx/V, cy/V, cz/V
+    if motor:
+        vm = (math.pi*14**2*19 + 14.6*9*17)/1000
+        mm_resin = vm*ASSUME['resin_g_per_cc']
+        zm, ym = -26.4 - 9.5, -8.0
+        M = m - mm_resin + motor_g
+        x, y, z = x*m/M, (y*m - ym*mm_resin + ym*motor_g)/M, (z*m - zm*mm_resin + zm*motor_g)/M
+        m = M
+    h = z + stand_h
+    e = math.hypot(x, y)
+    ang = math.degrees(math.atan((r_foot - e)/h))
+    print(f'  {"モーター" if motor else "手回し"}: 質量 {m:.0f}g・床からの重心高さ {h:.1f}mm・横ずれ {e:.1f}mm'
+          f' → 倒れ始める傾き {ang:.1f}° (足輪の外縁 r{r_foot:.0f})')
+    return ang
+
+
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == '--tip':   # python3 physics_check.py --tip asm_hand.stl [asm_motor.stl]
+        print('== 置き方: 倒れにくさ ==')
+        for k, path in enumerate(sys.argv[2:4]):
+            tipping(path, motor=(k == 1))
+    else:
+        main()

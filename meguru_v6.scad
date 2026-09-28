@@ -44,7 +44,7 @@ PART = "assembly"; // base | bevel_sun | bevel_pinion | cage(旧) | cage_core | 
                    // | e2p | ret_gear | ell_test | stud_cap
                    // | ring46 | sun_gear | planet_gear | spine   (v0.6a 歳差の背骨)
                    // | pillar_bridge | crank_pinion(退役) | crank_handle(退役)
-                   // | saros_seg | saros_idler | zodiac_half | motor_mount | coupling | hand_knob
+                   // | saros_seg | saros_idler | zodiac_half | hand_knob (motor_mount/coupling は v0.7.3 で退役)
                    // | assembly | exploded | anim | anim_prec | collide | collide_prec
                    // | mesh_self_pin | mesh_self_moon | mesh_self_e2p | mesh_self_ret | mesh_ell | bite_pair(2-10)
 
@@ -316,6 +316,7 @@ module base() {
       // v0.6b 地下輪列の吊りスタッド (fix33: 3段構成・ベース裏)
       translate([S1_XY[0], S1_XY[1], -6.0]) cylinder(d = AXLE_D, h = 6.0);   // W1P1 用 (fix41: 下へ1.1延長 — 端に軸端キャップ z-6.0..-5.0)
       translate([S2_XY[0], S2_XY[1], -4.7]) cylinder(d = AXLE_D, h = 4.7);   // W2P2 用 (fix41: 下へ1.0延長 — 端に軸端キャップ z-4.7..-3.7)
+      for (p = CRADLE_POSTS) translate([p[0], p[1], CRADLE_TOP]) cylinder(d = 8, h = -CRADLE_TOP + 0.5);   // Part B: 揺りかごの受け柱 (z-23.4..0)
       // ブリッジ支柱座は v0.4b で退避 / クランク軸座・穴は v0.6a で退避 (入力は中心軸へ一本化)
     }
     translate([0,0,1]) cylinder(r = 23.0, h = 2.01);         // 中央浅皿 (fix28→v0.6b: 23.0 — 冠環歯先22.5の逃げ。調芯は中心軸が担う)
@@ -346,7 +347,9 @@ module base() {
     }
     translate([0,0,-1]) cylinder(d = 3.4, h = 5);            // 駆動軸 床ジャーナル (fix35: 3.6→3.4 — 隣接監査で+0.6ガタを検出、標準ジャーナル径に統一)
     translate([S3_XY[0], S3_XY[1], -1]) cylinder(d = 3.4, h = 5);          // 縦シャフト ジャーナル (fix35: 3.6→3.4 — 0.6ガタは提灯×冠環の噛み深さを食う。fix34の穴位置修正も本行)
-    for (s = [-1, 1]) translate([0, s*26, -1]) cylinder(d = 3.2, h = 5);   // モーター取付 (v0.6b: y±24→±26 — 浅皿23.0の外)
+    // 旧モーター台の穴 (0,±26) は撤去 — +26 側は W1P1 の回転域の真上だった (Part B)
+    for (a = LEG_AZ) rotate([0,0,a]) translate([LEG_R0, 0, -0.01]) cylinder(d = 4.3, h = 1.2);   // Part B: 脚の位置決め穴 (座溝の下で板厚2.5 → 残り1.3)
+    for (p = CRADLE_POSTS) translate([p[0], p[1], CRADLE_TOP - 1]) cylinder(d = 2.6, h = 11);      // Part B: 受け柱の下穴 (M3 ローレットねじが下から切り込む・深さ10)
   }
 }
 
@@ -732,20 +735,8 @@ module st1_carrier() {   // fix40: 主輪を z13.2 へ上げた (局所0 = 空�
   }
 }
 
-module motor_mount() {
-  difference() {
-    union() {
-      translate([-29, -16, 0]) cube([58, 32, 4]);   // v0.6b: フランジ ±26 (浅皿23.0拡大に伴い外へ)
-      translate([-24, -16, 0]) cube([48, 4, 22]);
-      translate([-24, 12, 0]) cube([48, 4, 22]);
-    }
-    translate([0,0,-1]) cylinder(d = 30, h = 6);
-    translate([0,0,-1]) cylinder(d = 10, h = 30);
-    for (s = [-1,1]) translate([s*17.5, 0, -1]) cylinder(d = 3.2, h = 6);   // 28BYJ-48 の耳
-    for (s = [-1,1]) translate([s*26, 0, -1]) cylinder(d = 3.2, h = 6);    // ベース取付 (v0.6b: ±26・組立で90°回し)
-  }
-}
-// 手回しノブ (fix24): モーターを使わない時、coupling の代わりに裏から差す。軸受けは coupling と同じ d3.25 差し込み
+// motor_mount は v0.7.3 で退役 — 28BYJ-48 の実寸 (シャフト偏心8mm) と合っていなかった。後継 = motor_cradle (Part B)
+// 手回しノブ (fix24) — v0.7.3 からノブ兼カップリング (fix47): 下面の横溝にモーター軸の二面幅が前 (-y) から滑り込む
 // fix44: 真鍮φ3 の下端 8mm を D カット (中心から1.0の平面) にして受ける穴。clr<0 で軽圧入 (旧版は丸穴に丸軸で空転した)
 module d_socket(clr) { intersection() { circle(d = 3.0 + 2*clr); translate([-2, -2]) square([2 + 1.0 + clr, 4]); } }
 module hand_knob() {   // 上面 = 空間 z-6.4 (ピニオンA の 1.5 下)。D カット差し込み深さ8・軽圧入 (抜き差し可)
@@ -756,8 +747,12 @@ module hand_knob() {   // 上面 = 空間 z-6.4 (ピニオンA の 1.5 下)。D 
       translate([0,0,5]) cylinder(d = 10, h = 10);               // 軸受け筒
     }
     translate([0,0,7]) linear_extrude(height = 9) d_socket(-0.05);
+    // fix47: モーター軸の横溝 (局所 0-6・幅3.1・前 (-y) へ開く・奥は軸の丸みの外 +2.55)。二面幅 (3.0) の先端5mm が入り、
+    //   先端と仕切り (局所 6-7) の間は 1mm 空く — ノブは中心軸だけで支え、モーター軸で押し上げない (二重拘束を避ける)
+    translate([-KNOB_SLOT/2, -20, -1]) cube([KNOB_SLOT, 20 + 2.55, 7]);
   }
 }
+KNOB_SLOT = 3.1;
 
 // v0.5-B 地平環: 傾いた天球を囲む固定の水平環 (z70)。柱3本の先端ピンに載せ瞬着。
 // 4方位マーク = 牡羊点(春分)/蟹(夏至)/天秤(秋分)/山羊(冬至) の読み取り基準
@@ -772,18 +767,102 @@ module horizon_ring() {
   }
 }
 
-module coupling() {
+// coupling は v0.7.3 で退役 (fix47) — ノブの下面の横溝がモーター軸を受ける。ノブを抜き差しせずに手回し⇔モーターを替えられる
+
+// ===== Part B (v0.7.3): 置き方 = アーミラリーの三脚 + 足輪 (2026-09-28 たまさん選定) と モーターの揺りかご =====
+// 触れる比較 (A 三つ足 / B 三脚+足輪 / C 台座ドラム) の記録は stands.scad と partB-comparison.html
+STAND_H = 48;                  // 床からベース下面まで (モーター下端 z-45.4 を 2.6 浮かせる)
+LEG_AZ  = [90, 210, 330];      // ベースの継ぎ目 (48/168/288) から 42° 離す
+LEG_R0  = 68; LEG_R1 = 77;     // 脚の上端 (ベース下面の縁) / 下端 (足輪) の半径 — 外へ反る。上端は裏の刻印 (r≤64.0) の外
+FOOT_RI = 72; FOOT_RO = 82; FOOT_T = 4;
+FOOT_SEAMS = [45, 135, 225, 315];   // 足輪の継ぎ目 (90°×4 — 3分割だと弦136.8 がプリンタ133 に載らない)
+MOTOR_MODE = 0;                // 0: 手回し (ノブ) / 1: モーター (揺りかご + 28BYJ-48 + カップリング)
+MOTOR_FACE = -26.4;            // 28BYJ-48 の取付面 (シャフト先端 -16.4 — 二面幅の先端6mm だけカップリングへ)
+CRADLE_POSTS = [[-24, -24], [24, -24]];    // 揺りかごの受け柱 (ベースから下がる・r33.9: W3 歯先から3.2、モーター胴から指が入る9.8)
+CRADLE_TOP = MOTOR_FACE + 3;                // 揺りかご板の上面 = 受け柱の下端 (z-23.4)
+
+function leg_pt(t) = [LEG_R0 + (LEG_R1 - LEG_R0)*t*t, 0, -2 - (STAND_H - FOOT_T - 2)*t];
+module tripod_leg() {   // 脚1本 (同じものを3本印刷)。局所の方位0 に置いた形
+  intersection() {
+    union() {
+      for (i = [0:7]) hull() { translate(leg_pt(i/8)) sphere(d = 7.5); translate(leg_pt((i+1)/8)) sphere(d = 7.5); }
+      translate([LEG_R0, 0, -2]) cylinder(d = 8, h = 2);                                   // 上の座 (ベース下面の縁に瞬着・r64-72 — 刻印の外)
+    }
+    translate([0, -50, -(STAND_H - FOOT_T)]) cube([100, 100, STAND_H - FOOT_T]);          // z ∈ [-44, 0]
+  }
+  translate([LEG_R0, 0, -0.01]) cylinder(d = 4, h = 1.0);                                 // 上の位置決めピン (ベース下面の穴 d4.3×1.2)
+  translate([LEG_R1, 0, -(STAND_H - FOOT_T) - 2.5]) cylinder(d = 3, h = 2.51);            // 下のピン (足輪の穴 d3.3)
+}
+module tripod_legs() { for (a = LEG_AZ) rotate([0,0,a]) tripod_leg(); }
+module foot_ring() {   // 足輪 (床に置く輪・36等分の目盛り)
+  translate([0,0,-STAND_H]) difference() {
+    difference() { cylinder(r = FOOT_RO, h = FOOT_T); translate([0,0,-1]) cylinder(r = FOOT_RI, h = FOOT_T + 2); }
+    for (i = [0:35]) if (len([for (a = LEG_AZ) if (a == i*10) 1]) == 0)                   // 脚の降りる所は目盛りを抜く
+      rotate([0,0,i*10]) translate([LEG_R1, 0, FOOT_T]) cube([6, 0.8, 1], center = true);   // 目盛り (深さ0.5)
+    for (a = LEG_AZ) rotate([0,0,a]) translate([LEG_R1, 0, FOOT_T - 2.8]) cylinder(d = 3.3, h = 3);   // 脚のピン穴
+  }
+}
+module foot_ring_seg(k) {   // 90°×4 分割 (切り面ダボ: 進み端ピン d1.6 / 遅れ端穴 d2.0 — 地平環と同じ流儀)
+  a0 = FOOT_SEAMS[k];
   difference() {
-    cylinder(d = 10, h = 16);
-    translate([0,0,-1]) linear_extrude(height = 9)
-      difference() { circle(d = 5.2); translate([1.5, -3]) square([3, 6]); }
-    translate([0,0,8]) linear_extrude(height = 9) d_socket(0.05);   // fix44: D カット (旧: 丸穴で空転)
+    union() {
+      intersection() { foot_ring(); rotate([0,0,a0]) translate([0,0,-STAND_H - 1]) rotate_extrude(angle = 90) square([90, FOOT_T + 2]); }
+      rotate([0,0, a0 + 89.2]) translate([LEG_R1, -1.2, -STAND_H + FOOT_T/2]) rotate([-90,0,0]) cylinder(d = 1.6, h = 4.2);
+    }
+    rotate([0,0, a0 - 1.0]) translate([LEG_R1, 0, -STAND_H + FOOT_T/2]) rotate([-90,0,0]) cylinder(d = 2.0, h = 4.5);
   }
 }
 
+// 28BYJ-48 (Kiatronics データシート: 胴Ø28×19・耳の穴Ø4.2 間隔35 R3.5・シャフトØ5 二面幅3 取付面から10・ボスØ9×1.5・
+//   シャフトは胴体中心から8mm 偏心・配線カバー幅14.6 が中心から17 まで)。取付面 = z0・シャフト +z・シャフト軸 = 原点
+module motor_28byj48(shaft_a = 0) {   // shaft_a: シャフトだけの回転角 (胴体・耳は固定)
+  color("#b8bcc4") {
+    translate([0, -8, -19]) cylinder(d = 28, h = 19);
+    difference() {
+      hull() for (s = [-1, 1]) translate([s*17.5, -8, -0.8]) cylinder(r = 3.5, h = 0.8);
+      for (s = [-1, 1]) translate([s*17.5, -8, -2]) cylinder(d = 4.2, h = 3);
+    }
+    cylinder(d = 9, h = 1.5);
+    rotate([0,0,shaft_a]) difference() { cylinder(d = 5, h = 10); translate([0,0,4]) for (s = [-1, 1]) translate([s*3.5, 0, 3]) cube([4, 6, 6.01], center = true); }
+  }
+  color("#3f7fd0") translate([-7.3, -25, -18.5]) cube([14.6, 9, 17]);
+}
+// 揺りかご: モーターを載せる板。ベースから下がる受け柱2本に、下からローレットねじ M3×8 で留める (指で回せる・工具不要)。
+//   外す時はねじ2本を抜いて前 (-y) へ滑らせる — モーター軸がノブの横溝から抜け、脚の間から出る (床まで2.6mm しかないので下へは抜けない)。
+//   旧案 (柱が揺りかご側・M3 を上から) はねじ頭がリング46の真下に閉じ込められ、手回し⇔モーターの付け替えのたびに
+//   リングと心臓を外す必要があった (組み込み経路の検査で発見)。モーターの耳は机の上で M3×8+ナットで板の下へ
+module motor_cradle() {
+  difference() {
+    translate([0,0,MOTOR_FACE]) linear_extrude(height = 3) hull() {
+      for (p = CRADLE_POSTS) translate(p) circle(d = 10);
+      for (s = [-1, 1]) translate([s*17.5, -8]) circle(r = 5);
+      circle(d = 14);
+    }
+    translate([0,0,MOTOR_FACE - 1]) cylinder(d = 10, h = 5);                                // ボス+シャフトの穴
+    for (s = [-1, 1]) translate([s*17.5, -8, MOTOR_FACE - 1]) cylinder(d = 3.2, h = 5);     // 耳のねじ穴 (M3)
+    for (s = [-1, 1]) translate([s*17.5, -8, CRADLE_TOP - 1.5]) cylinder(d1 = 3.2, d2 = 6.2, h = 1.51);   // 皿もみ (皿ねじの頭を板の上面に沈める)
+    for (p = CRADLE_POSTS) translate([p[0], p[1], MOTOR_FACE - 1]) cylinder(d = 3.4, h = 5); // ローレットねじの通し穴
+  }
+}
+module motor_hardware() {   // 市販のねじ類 (検査で見えるように外形だけ描く)
+  color("#9aa0a8") {
+    for (p = CRADLE_POSTS) translate([p[0], p[1], 0]) {                                    // ローレットねじ M3×8 (頭 d10×4)
+      translate([0,0,MOTOR_FACE - 4]) cylinder(d = 10, h = 4);
+      translate([0,0,MOTOR_FACE]) cylinder(d = 2.6, h = 8);                                // 軸 (谷径で描く — 下穴 d2.6 に自分でねじを切る)
+    }
+    for (s = [-1, 1]) translate([s*17.5, -8, 0]) {                                         // 耳: 皿小ねじ M3×8 (頭は板に沈む) + ナット (耳の下)
+      translate([0,0,CRADLE_TOP - 1.6]) cylinder(d1 = 3, d2 = 6.2, h = 1.6);
+      translate([0,0,CRADLE_TOP - 8]) cylinder(d = 3, h = 8);
+      translate([0,0,MOTOR_FACE - 0.8 - 2.4]) rotate([0,0,30]) cylinder(d = 6.35, h = 2.4, $fn = 6);   // 平らな辺を胴に向ける
+    }
+  }
+}
+module motor_group(shaft_a = 0) { motor_cradle(); motor_hardware(); translate([0,0,MOTOR_FACE]) motor_28byj48(shaft_a); }
+SHOW_STAND = 1;   // 組立図に三脚+足輪を描くか (stands.scad の比較用に 0 へ上書きできる)
+
 // ---------- 組立 ----------
 // ca ≡ リング46角 (旧かご角と同一定義 — 下流サロス/天球の式は v0.5 と不変) / pa = 歳差方位
-// stage (v0.7-B 組立ガイド用): 0=土台 / 1=+地下と背骨 / 2=+心臓 / 3=+大周期 / 4=+電動 (9=全部)
+// stage (v0.7-B 組立ガイド用): 0=土台+三脚 / 1=+地下と背骨 / 2=+心臓 / 3=+大周期 / 4=+電動 (9=全部・MOTOR_MODE でノブ⇔モーター)
 module assembly(explode = 0, ca = 0, pa = PREC_AZ, stage = 9) {
   e = explode;
   pae     = pa + (AUTO_PREC != 0 ? -3*ca/(PREC_RATIO - 4) : 0);   // 歳差は ca に従属。fix36: 遊星段の連成 (−4) を入れた厳密式
@@ -797,7 +876,7 @@ module assembly(explode = 0, ca = 0, pa = PREC_AZ, stage = 9) {
   saros_a = -ca * SAROS_RATIO + SAROSR_PH;   // fix30: fix22 の再訂正 — 内歯噛みは回転方向を保存する
   // (アイドラ(-) → リング(-)。自前の遊星→内歯36と同じ標準則)。符号+だと位相ズレが 2·RATIO·ca で蓄積し、
   // 歯ピッチ整数倍の角度だけ偶然噛む (PAIR3 の ✅/⚠️ パターン8/8がこの式で完全に予言できた = 決定的証拠)。
-  // ⚠️ 見た目の回転向きが fix22 承認時と逆になる — 検品17でたまさん判定待ち。v4 バックポート候補
+  // 見た目の回転向きは fix22 承認時と逆 → 検品17 (2026-08-14) で「このままで良し」と承認・v4 バックポート済
   idler_a = -ca * Z_CAGE / Z_IDLER + SIDL_PH; // fix22: 外歯ペアの保存式より負
   inner_a = hca * BEV_SUN_T / BEV_PIN_T;     // 第2軸: 1自転/公転 (プレート局所)
   moon_a  = inner_a - ell_F(inner_a);        // 月+軸+G: 正味自転0 + 秤動 (±2e rad ≈ ±28.5°)
@@ -808,10 +887,18 @@ module assembly(explode = 0, ca = 0, pa = PREC_AZ, stage = 9) {
 
   if (stage >= 1) color("#d8c690") translate([0, 0, AXLE_BOT - e*2]) cylinder(d = AXLE_D, h = 13 - AXLE_BOT);   // fix44: 真鍮 27.4mm (下端8mm D カット)
   if (stage >= 1) color("#8a7020") translate([0, 0, -e*1.5]) ub_caps();
-  if (stage >= 1) color("#666e7e") translate([0, 0, AXLE_BOT - 7 - e*3]) rotate([0,0,axle_a]) hand_knob();   // 中心駆動軸 (真鍮32mm z-19..13)
+  motor_on = (MOTOR_MODE == 1) || (stage == 4);
+  if (stage >= 1) color("#666e7e") translate([0, 0, AXLE_BOT - 7 - e*3]) rotate([0,0,shaft_a]) hand_knob();   // ノブ兼カップリング (両モード)
+  if (motor_on) {   // Part B: モーター駆動 (揺りかご+28BYJ-48 を前から滑り込ませ、ローレットねじ2本で受け柱へ)
+    color("#6e675c") translate([0, 0, -e*5]) motor_cradle();
+    translate([0, 0, MOTOR_FACE - e*6]) motor_28byj48(shaft_a);
+    translate([0, 0, -e*6]) motor_hardware();
+  }
   color("#8a7020") base();
-  // モーター台+カップリングは退避 (v0.7.2): 28BYJ-48 はシャフトが胴体中心から8mmずれ、上下の積み方も寸法と合っていなかった
-  // (v0.2 以来・モーターの形が図面に無く検査に映らなかった)。「置き方 (脚/台座)」と一体で作り直す — Part B
+  if (SHOW_STAND == 1) {
+    color("#8a7020") translate([0, 0, -e*2]) tripod_legs();              // Part B: アーミラリーの三脚
+    color("#8a7020") translate([0, 0, -e*4]) foot_ring();                // Part B: 足輪
+  }
   if (stage >= 3) color("#8a7020") translate([0, 0, 70 + e*5]) horizon_ring();   // v0.5-B 地平環 (柱先端ピンに瞬着)
   if (stage >= 3) color("#6b5a1a") rotate([0,0,saros_a]) for (k = [0:2]) rotate([0,0,k*120])
     translate([0,0,H_SAROS + e*0.5]) saros_seg(k);
@@ -941,7 +1028,10 @@ else if (PART == "ell_test") ell_gear(0, 3.2);
 else if (PART == "tilt_ring") tilt_ring();
 else if (PART == "crown_idler") crown_idler();
 else if (PART == "st1_carrier") st1_carrier();
-else if (PART == "none") { }   // 他の .scad から include して部品モジュールだけ使うとき用 (末尾の else=全体組立を描かない)
+else if (PART == "none") { }
+else if (PART == "tripod_leg") tripod_leg();          // ×3 印刷
+else if (PART == "foot_ring_seg") foot_ring_seg(SEG);  // SEG=0..3
+else if (PART == "motor_cradle") motor_cradle();   // 他の .scad から include して部品モジュールだけ使うとき用 (末尾の else=全体組立を描かない)
 else if (PART == "ring46") ring46();
 else if (PART == "sun_gear") sun_gear();
 else if (PART == "planet_gear") planet_gear();
@@ -971,8 +1061,6 @@ else if (PART == "horizon_seg")   // 地平環 120°×3 (φ133 は一枚だと�
 else if (PART == "saros_seg") saros_seg(SEG);
 else if (PART == "saros_idler") saros_idler();
 else if (PART == "zodiac_half") zodiac_half();
-else if (PART == "motor_mount") motor_mount();
-else if (PART == "coupling") coupling();
 else if (PART == "exploded") assembly(explode = 8);
 else if (PART == "turntable") rotate([0,0,$t*360]) assembly(explode = 0, ca = $t*360);   // 全体観覧: 台1回転+かご1回転
 // ---------- v0.6c 印刷分割 (SEG=0/1/2) ----------
@@ -1068,6 +1156,12 @@ else if (PART == "engage")   // v0.7-D 実在検査: 機能噛合ペアを δ=0.
         translate([RET_X, 0, 0]) rotate([0,90,0]) ret_gear();
       translate([0,0,PREC_Z]) rotate([0,PREC_TILT,0]) rotate([0,0,CAGE_PH]) translate([0,0,GLOBE_Z]) rotate([0,0,90])
         translate([RET_X, 0, STUD_R - SQ]) rotate([0,90,0]) rotate([0,0,180]) e2p();
+    }
+    if (EP == 16) intersection() {  // v0.7.3 fix47: モーター軸 × ノブの横溝 (寄せ = 軸だけ 3° 回す — すき間0.05 を詰めて溝の壁に当たるか)
+      translate([0,0,AXLE_BOT - 7]) hand_knob();
+      translate([0,0,MOTOR_FACE]) rotate([0,0,3]) intersection() {
+        difference() { cylinder(d = 5, h = 10); translate([0,0,4]) for (s = [-1, 1]) translate([s*3.5, 0, 3]) cube([4, 6, 6.01], center = true); }
+      }
     }
   }
 else if (PART == "collide") intersection() { rotating_at(ANGLE); fixed_noncontact(); }
