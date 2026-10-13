@@ -20,7 +20,7 @@ integer gear ratios. Co-created by a family physician and Claude (AI).
 - `verify_v7.sh` / `stl_solid.py` / `stl_vol.py` — 全数検証の台本 (OpenSCAD Manifold バックエンド・数分)
 - `pairwise.sh` / `pairwise.scad` — 総当たり (20剛体・手回し/モーターの2モード)・重力 (支えの有無)・付け替え経路 (モーターの揺りかごを前へ滑らせる掃引) の検査 / `physics_check.py` — トルク・浮き・倒れにくさ (`--tip`) の机上計算
 - `stands.scad` — 置き方の触れる比較で選ばなかった案 (A 三つ足 / C 台座ドラム) の記録
-- `docs/` — 機構解説・触れる解剖図 (`anatomy-v7.html`・ノブを回して分解する単体 HTML)・組み立ての書・印刷計画書・隣接台帳 (GitHub Pages)
+- `docs/` — 機構解説・触れる解剖図 (`anatomy-v7.html` 全体 / `libration-v7.html` 秤動の楕円歯車・どちらも単体 HTML)・組み立ての書・印刷計画書・隣接台帳 (GitHub Pages)
 
 ## 状態 / Status
 > ✅ **置き方とモーターの揺りかごまで設計・検証済み (v0.7.3, 2026-09-28)**: アーミラリーの三脚+足輪で立ち (倒れ始める傾き 56°)、モーターは揺りかごを前から滑り込ませてノブの下面の横溝に軸を差す (工具なしで手回しと付け替え)。物理チェックで見つかった組み上がらない箇所も修正済み (v0.7.2)。**実機は未印刷**です。
