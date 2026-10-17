@@ -1,69 +1,664 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>巡る天の心臓 — アンティキティラ × トゥールビヨン</title>
-<meta property="og:title" content="巡る天の心臓 — アンティキティラ × トゥールビヨン">
-<meta property="og:description" content="2000年前の天文計算機に18.6年の歳差を仕込んだ真・3軸機構。すべて歯数の整数比から。">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>巡る天の心臓 — アンティキティラ機構の、卓上の子孫</title>
+<meta name="description" content="2000年前の天文計算機アンティキティラ機構の卓上サイズの子孫。3軸のトゥールビヨンの心臓に、月の秤動・サロス周期・傾く天球・18.6年の交点歳差を歯数の整数比で仕込んだ、光造形用のオープンソース設計（実機は未印刷）。">
+<meta property="og:title" content="巡る天の心臓 — アンティキティラ機構の、卓上の子孫">
+<meta property="og:description" content="2000年前の天文計算機アンティキティラ機構の卓上サイズの子孫。3軸のトゥールビヨンの心臓に、月の秤動・サロス周期・傾く天球・18.6年の交点歳差を歯数の整数比で仕込んだ、光造形用のオープンソース設計（実機は未印刷）。">
+<meta name="theme-color" content="#121013">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300..500&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0d1220; --card:#151c2e; --brass:#c9a227; --silver:#aab4c4; --text:#e8e4d8; --sub:#9aa3b5; --flow:#5ec8e0; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; line-height:1.8; padding:2rem 1rem 4rem; }
-  .wrap { max-width:780px; margin:0 auto; }
-  h1 { font-size:1.35rem; color:var(--brass); text-align:center; letter-spacing:0.06em; }
-  header p { color:var(--sub); font-size:0.9rem; text-align:center; margin-top:0.6rem; }
-  .gif { display:flex; justify-content:center; background:radial-gradient(circle at 50% 45%, #1a2340 0%, #0d1220 78%); border-radius:12px; padding:0.8rem; margin:1.4rem 0 0.3rem; }
-  .gif img { max-width:100%; border-radius:8px; }
-  .cap { font-size:0.78rem; color:var(--sub); text-align:center; margin-bottom:1rem; }
-  .cards { display:grid; gap:0.8rem; margin:1.6rem 0; }
-  a.card { display:flex; gap:1rem; align-items:center; background:var(--card); border:1px solid #232d45; border-radius:12px; padding:1.1rem 1.3rem; text-decoration:none; color:var(--text); transition:border-color .15s; }
-  a.card:hover { border-color:var(--brass); }
-  .card .ic { font-size:1.6rem; }
-  .card h3 { font-size:0.98rem; color:var(--brass); }
-  .card p { font-size:0.82rem; color:var(--sub); margin-top:0.15rem; }
-  .facts { background:var(--card); border:1px solid #232d45; border-radius:12px; padding:1.1rem 1.3rem; font-size:0.86rem; margin:1.4rem 0; }
-  .facts b { color:var(--flow); }
-  footer { text-align:center; color:#5a6478; font-size:0.75rem; margin-top:2.5rem; }
-  .back { display:block; text-align:center; margin-top:1.5rem; font-size:0.85rem; }
-  .back a { color:var(--silver); }
+:root {
+  color-scheme: dark;
+  /* dealt proportions (dark room), colours taken from the subject:
+     ground = the darkness of the fragment photographs, accent = the gold of the render */
+  --bg: #121013;
+  --surface: #1e1b1f;
+  --ink: #eae8e4;
+  --muted: #a39d96;
+  --accent: #deb32c;
+  --accent-strong: #ecc54a;
+  --accent-ink: #121013;
+  --accent-deep: #6b5717;
+  --field-2: #e6e3de;
+  --field-2-ink: #121013;
+  --field-2-muted: #4d4843;
+
+  --font: "Literata", "Noto Serif JP", "Hiragino Mincho ProN", serif;
+
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --step-head: clamp(1.4375rem, 1.05rem + 1.7vw, 2.25rem);
+  --step-display: clamp(2.3rem, 1.2rem + 4.6vw, 5rem);
+
+  --margin: clamp(1rem, 2.1vw, 1.875rem);
+  --gutter: clamp(0.75rem, 1.4vw, 1.5rem);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-ui: 240ms;
+  --t-reveal: 800ms;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: var(--step-body); font-weight: 400; line-height: 1.6;
+  font-kerning: normal; text-rendering: optimizeLegibility; overflow-x: clip;
+}
+img, video, svg { display: block; max-width: 100%; }
+img, video { height: auto; }
+p { margin: 0; text-wrap: pretty; }
+h1, h2, h3 { margin: 0; font-weight: 400; text-wrap: balance; hyphens: none; }
+h1, h2, h3, .stairs, .names, .page-name, .steps li, .hero-sentence { word-break: auto-phrase; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 0.07em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+figure { margin: 0; }
+.only-narrow { display: none; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cap { font-size: var(--step-small); line-height: 1.45; color: var(--muted); margin-top: 0.6em; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* the one solid light element: the primary action */
+.button {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0.55em 1.1em;
+  background: var(--accent); color: var(--accent-ink); text-decoration: none;
+  font-size: var(--step-small); font-weight: 500; letter-spacing: 0.01em; border-radius: 0;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) ease;
+}
+.button:active { transform: scale(0.97); }
+.link { text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color var(--t-hover) ease, color var(--t-hover) ease; }
+@media (hover: hover) and (pointer: fine) {
+  .button:hover { background-color: var(--accent-strong); }
+  .link:hover { text-decoration-color: currentColor; }
+}
+
+main { position: relative; z-index: 1; background: var(--bg); }
+
+
+/* ---------- motion: transform and opacity only; the reduced state is the finished state ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* signature: the ancestor's fragments crossfade slowly, like light shifting in a room */
+  .xfade img { animation: xf 21s linear infinite; }
+  .xfade img:nth-child(1) { animation-delay: -1.6s; }
+  .xfade img:nth-child(2) { animation-delay: 5.4s; }
+  .xfade img:nth-child(3) { animation-delay: 12.4s; }
+  .xfade img + img { opacity: 0; }
+  .is-hidden .xfade img { animation-play-state: paused; }
+
+  /* hero load: two masked lines, the sentence, the prints */
+  .js .lines [data-line] { transform: translateY(105%); animation: line-up 900ms var(--ease-out) forwards; animation-delay: calc(var(--i) * 110ms + 150ms); }
+  .js [data-rise] { opacity: 0; transform: translateY(18px); animation: rise var(--t-reveal) var(--ease-out) forwards; animation-delay: calc(var(--i, 0) * 90ms + 120ms); }
+
+  /* section parts arrive in reading order, once */
+  .js [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 480ms var(--ease-out), transform 620ms var(--ease-out); transition-delay: calc(min(var(--i, 0), 4) * 60ms); }
+  .js [data-reveal].is-in { opacity: 1; transform: none; }
+  .js [data-settle] { opacity: 0; transform: scale(1.04); transition: opacity 520ms var(--ease-out), transform 1200ms var(--ease-soft); transition-delay: calc(min(var(--i, 0), 4) * 60ms); }
+  .js [data-settle].is-in { opacity: 1; transform: none; }
+
+  .file-row:active, .page-link:active { transform: scale(0.99); }
+  .file-row, .page-link { transition: color var(--t-hover) ease, transform var(--t-press) var(--ease-out); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xfade img + img { display: none; }
+}
+@keyframes xf { 0% { opacity: 0; } 7.6% { opacity: 1; } 33.3% { opacity: 1; } 41% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes line-up { to { transform: none; } }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+/* ---------- hero: two prints in darkness ---------- */
+.hero { position: relative; height: 100svh; min-height: 680px; overflow: clip; }
+.nav { position: absolute; top: 30px; left: var(--margin); display: flex; gap: 1.6em; align-items: baseline; font-size: var(--step-small); z-index: 2; }
+.nav a { text-decoration: none; color: var(--ink); }
+.nav .wordmark { font-weight: 500; margin-right: 0.6em; }
+.nav-action { position: absolute; top: 20px; right: var(--margin); z-index: 2; }
+.print--large { position: absolute; left: 37vw; top: 12svh; width: 46vw; }
+.print--large video, .print--large img { width: 100%; height: auto; aspect-ratio: 700 / 620; background: var(--bg); }
+.print--small { position: absolute; left: calc(var(--margin) + 7vw); top: 50svh; width: 13vw; }
+.xfade { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--bg); }
+.xfade img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7); }
+.xfade img + img { opacity: 0; }
+.hero-foot { position: absolute; left: var(--margin); right: var(--margin); bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; }
+.hero-title { font-size: var(--step-head); font-weight: 300; line-height: 1.12; letter-spacing: -0.015em; margin-left: -0.04em; }
+.lines .line { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.lines [data-line] { display: block; }
+.hero-sentence { width: 24vw; max-width: 21em; color: var(--muted); line-height: 1.55; }
+
+/* ---------- intro: staircase statement ---------- */
+.intro { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 120px 0; }
+.stairs { font-size: var(--step-head); font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; padding-left: 4vw; margin: 0; max-width: 74vw; }
+.stairs span { display: block; }
+.stairs span:nth-child(1) { padding-left: 0; }
+.stairs span:nth-child(2) { padding-left: 6vw; color: var(--muted); }
+.stairs span:nth-child(3) { padding-left: 12vw; }
+.stairs span:nth-child(4) { padding-left: 18vw; color: var(--muted); }
+.stairs span:nth-child(5) { padding-left: 24vw; }
+.intro-pics { position: absolute; right: var(--margin); top: calc(50% - 117px); width: 20vw; display: grid; gap: 16px; }
+.intro-pics img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--bg); filter: brightness(0.85) contrast(1.05); }
+.intro-note { position: absolute; left: 4vw; bottom: 48px; font-size: var(--step-small); color: var(--muted); max-width: 34em; }
+
+/* ---------- features: one scene, stepping statements ---------- */
+.scene { position: relative; height: 450vh; }
+.scene-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--bg); }
+.scene-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 55%; filter: brightness(0.55) contrast(1.05); }
+.scene-scrim { position: absolute; inset: 0 0 auto 0; height: 40%; background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0)); } /* taste-skill-ignore: neutral black scrim over the photograph, the allowed exception */
+.steps { position: absolute; top: 9svh; left: 50%; transform: translateX(-50%); width: min(30em, 84vw); margin: 0; padding: 0; list-style: none; text-align: center; display: grid; gap: 10px; z-index: 2; }
+.steps li { color: var(--muted); transition: color 400ms ease; font-size: var(--step-body); line-height: 1.4; }
+.steps li h2 { font-size: inherit; font-weight: 500; }
+.steps li.is-active { color: var(--ink); }
+.step-pic { position: absolute; margin: 0; opacity: 0; transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out); transform: translateY(16px); z-index: 1; }
+.step-pic.is-on { opacity: 1; transform: none; }
+.step-pic img, .step-pic video { width: 100%; height: auto; background: var(--bg); }
+.step-pic .cap { color: var(--ink); }
+.step-pic.l { left: 7vw; width: 16vw; }
+.step-pic.r { right: 7vw; width: 15vw; }
+.step-pic.t1 { top: 40svh; } .step-pic.t2 { top: 52svh; } .step-pic.t3 { top: 34svh; } .step-pic.t4 { top: 58svh; }
+.scene-markers { position: absolute; inset: 0; pointer-events: none; }
+.scene-markers div { position: absolute; left: 0; width: 1px; height: 70vh; }
+html:not(.js) .step-pic[data-step="1"] { opacity: 1; transform: none; }
+
+/* the live thing */
+.live { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: 160px var(--margin) 180px; align-items: center; }
+.live-text { grid-column: 1 / span 6; padding-left: 4vw; }
+.live-text h3 { font-size: var(--step-head); font-weight: 300; line-height: 1.15; letter-spacing: -0.015em; margin-bottom: 0.7em; }
+.live-text p { max-width: 30em; }
+.live-form { margin-top: 1.6em; display: flex; flex-wrap: wrap; gap: 0.8em 1em; align-items: center; }
+.live-form label { font-size: var(--step-small); color: var(--muted); }
+.live-form input {
+  font: inherit; font-size: var(--step-body); color: var(--ink); background: var(--surface); border: 0; border-radius: 0;
+  min-height: 52px; padding: 0.4em 0.7em; color-scheme: dark;
+}
+.live-dial { grid-column: 8 / span 5; display: grid; justify-items: start; gap: 1.2em; }
+.live-dial .dial { width: min(30vw, 400px); height: auto; }
+.dial-labels text { fill: var(--muted); font-size: 8.5px; text-anchor: middle; dominant-baseline: central; font-variant-numeric: tabular-nums; }
+.live-dial .cap { max-width: 26em; margin-top: 0; }
+.live-out { font-size: var(--step-display); font-weight: 300; line-height: 1; letter-spacing: -0.02em; }
+.live-sub { color: var(--muted); }
+
+/* ---------- proof: names as one sentence ---------- */
+.proof { padding: 200px var(--margin) 200px calc(var(--margin) + 4vw); }
+.names { font-size: var(--step-head); line-height: 1.35; font-weight: 400; max-width: 34em; }
+.names h2, .names p { display: inline; font-size: inherit; line-height: inherit; }
+.names h2 { color: var(--ink); font-weight: 500; }
+.names p { color: var(--muted); }
+.names .name { transition: color 400ms ease; }
+.names .name.is-lit, .names .end { color: var(--ink); }
+.proof-more { margin-top: 3.2em; max-width: 36em; }
+.proof-more a { color: var(--ink); }
+.proof-more p + p { margin-top: 1em; }
+
+/* ---------- list: sticky picture, active list ---------- */
+.files { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: 120px var(--margin) 200px; align-items: start; }
+.files-pic { grid-column: 1 / span 5; position: sticky; top: 12vh; }
+.files-frame { position: relative; aspect-ratio: 4 / 5; width: 34vw; background: var(--bg); }
+.files-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 600ms ease; }
+.files-frame img.is-on { opacity: 1; }
+.files-body { grid-column: 7 / span 5; }
+.files-body h2 { font-size: var(--step-head); font-weight: 300; line-height: 1.15; letter-spacing: -0.015em; margin-bottom: 48px; }
+.file-list { list-style: none; margin: 0; padding: 0; }
+.file-row {
+  width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 1em; min-height: 58px;
+  padding: 0.5em 0; background: none; border: 0; color: var(--muted); font: inherit; text-align: left; cursor: pointer;
+  transition: color var(--t-hover) ease;
+}
+.file-name { font-size: var(--step-body); }
+.file-fact { font-size: var(--step-small); white-space: nowrap; }
+.file.is-active .file-row { color: var(--ink); }
+.file-desc { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms var(--ease-out); }
+.file-desc > div { overflow: hidden; }
+.file-desc p { font-size: var(--step-small); line-height: 1.55; max-width: 34em; padding-bottom: 1em; color: var(--ink); }
+.file.is-active .file-desc { grid-template-rows: 1fr; }
+html:not(.js) .file-desc { grid-template-rows: 1fr; }
+.files-note { margin-top: 2em; max-width: 30em; }
+.files-go { margin-top: 1.4em; font-size: var(--step-body); }
+
+/* ---------- work: big names, fixed preview ---------- */
+.pages { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: 160px var(--margin) 220px; align-items: start; }
+.pages-list { grid-column: 1 / span 8; padding-left: 4vw; }
+.pages-list h2 { font-size: var(--step-head); font-weight: 300; margin-bottom: 48px; }
+.page-links { list-style: none; margin: 0; padding: 0; }
+.page-link { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 26px; text-decoration: none; color: var(--muted); transition: color var(--t-hover) ease; }
+.page-name { font-size: var(--step-display); font-weight: 300; line-height: 1.05; letter-spacing: -0.02em; }
+.page-sub { font-size: var(--step-small); }
+.page-link.is-active, .page-link:focus-visible { color: var(--ink); }
+.pages-frame { grid-column: 9 / span 4; position: sticky; top: 15vh; aspect-ratio: 4 / 5; width: 100%; background: var(--bg); }
+.pages-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity 200ms ease; }
+.pages-frame img.is-on { opacity: 1; }
+
+/* ---------- footer: columns above, the hidden inscription below ---------- */
+.foot {
+  position: sticky; bottom: 0; z-index: 0; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto;
+  background: var(--field-2); color: var(--field-2-ink); padding: 40px var(--margin) 24px;
+}
+.foot-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 32px; font-size: var(--step-small); line-height: 1.6; }
+.foot-col { grid-column: span 3; }
+.foot-col p, .foot-col li { color: var(--field-2-muted); }
+.foot-col .first { color: var(--field-2-ink); font-weight: 500; }
+.foot-col ul { list-style: none; margin: 0; padding: 0; }
+.foot a { color: var(--field-2-ink); }
+.foot ::selection { background: var(--field-2-ink); color: var(--field-2); }
+.foot :focus-visible { outline-color: var(--field-2-ink); }
+.credits { color: var(--field-2-muted); }
+.inscription { align-self: end; }
+.inscription svg { width: 100%; height: auto; }
+.inscription text { fill: var(--field-2-ink); font-family: var(--font); font-weight: 300; }
+.legal { margin-top: 20px; font-size: var(--step-small); color: var(--field-2-muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4em 2em; }
+
+
+/* tablet and phone: the hero becomes its own composition */
+@media (max-width: 1024px) {
+  .print--large { left: auto; right: var(--margin); top: 12svh; width: 78vw; }
+  .print--large .cap { text-align: right; }
+  .only-wide { display: none; } .only-narrow { display: inline; }
+  .print--small { left: var(--margin); top: calc(12svh + 78vw * 0.886 - 24px); width: 30vw; }
+  .print--small .cap { display: none; }
+  .print--small { width: 22vw; }
+  .hero-foot { flex-direction: column; align-items: flex-start; gap: 18px; bottom: 28px; }
+  .hero-title { font-size: clamp(1.5625rem, 6.4vw, 2.25rem); }
+  .hero-sentence { width: auto; max-width: 30em; }
+  .hero { min-height: 720px; }
+}
+
+/* ---------- phone: its own composition ---------- */
+@media (max-width: 760px) {
+  .nav { top: 22px; }
+  .nav a:not(.wordmark) { display: none; }
+  .nav-action { top: 14px; }
+  .print--small { width: 30vw; }
+  .hero-sentence { font-size: 15px; }
+
+  .intro { min-height: 0; padding: 112px 0 96px; display: block; }
+  .stairs { font-size: 6.1vw; padding-left: var(--margin); max-width: none; }
+  .stairs span:nth-child(2) { padding-left: 5vw; } .stairs span:nth-child(3) { padding-left: 10vw; }
+  .stairs span:nth-child(4) { padding-left: 15vw; } .stairs span:nth-child(5) { padding-left: 20vw; }
+  .intro-pics { position: static; width: auto; grid-template-columns: 1fr 1fr; gap: 12px; margin: 48px var(--margin) 0; }
+  .intro-note { position: static; margin: 32px var(--margin) 0; }
+
+  /* the devices: one screen that scrolls past instead of a pinned story */
+  .scene { height: auto; }
+  .scene-pin { position: relative; height: auto; min-height: 136vw; display: flex; flex-direction: column; justify-content: flex-end; }
+  .scene-markers, .step-pic { display: none; }
+  .step-pic.phone-pic { display: block; opacity: 1; transform: none; left: auto; right: var(--margin); top: 28px; width: 50vw; }
+  .steps { position: relative; top: auto; left: auto; transform: none; width: auto; text-align: left; gap: 6px; padding: 0 var(--margin) 36px; }
+  .steps li { font-size: 17px; color: var(--ink); }
+  .scene-scrim { inset: auto 0 0 0; height: 62%; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.66)); } /* taste-skill-ignore: neutral black scrim over the photograph (phone) */
+
+  .live { display: block; padding: 112px var(--margin); }
+  .live-text { padding-left: 0; }
+  .live-dial { margin-top: 48px; }
+  .live-dial .dial { width: 86vw; }
+
+  .proof { padding: 112px var(--margin); }
+
+  .files { display: block; padding: 96px var(--margin) 112px; }
+  .files-pic { position: static; margin-bottom: 40px; }
+  .files-frame { width: 100%; aspect-ratio: 4 / 3; }
+  .file-row { min-height: 56px; }
+
+  .pages { display: block; padding: 112px var(--margin); }
+  .pages-list { padding-left: 0; }
+  .pages-frame { display: none; }
+  .page-link { color: var(--ink); padding: 0 0 40px; }
+  .page-name { font-size: 9.5vw; }
+
+  .foot-col { grid-column: span 6; }
+  .foot { grid-template-rows: auto minmax(20svh, 1fr) auto; }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <h1>巡る天の心臓<br><span style="font-size:0.85rem;color:var(--sub);">アンティキティラ × トゥールビヨン — 真・3軸機構</span></h1>
-  <p>2000年前の天文計算機の子孫に、月の秤動・サロス周期・傾く天球、そして<br>
-  <b style="color:var(--brass);">18.6年の交点歳差 (誤差+0.18%)</b> を仕込みました。すべて歯数の整数比から。</p>
-</header>
+<main>
+  <header class="hero" id="top">
+    <nav class="nav" aria-label="ページ内">
+      <a class="wordmark" href="#top">巡る天の心臓</a>
+      <a class="link" href="#devices">仕掛け</a>
+      <a class="link" href="#repo">中身</a>
+      <a class="link" href="#pages">解説</a>
+    </nav>
+    <a class="button nav-action" href="mechanism-explainer-v6.html">機構解説を読む</a>
 
-<div class="gif"><img src="turntable_v7.gif" alt="全体観覧" loading="lazy"></div>
-<p class="cap">全体観覧 — リング1回転 = 1朔望月。月がうなずき、サロスが食を数え、太陽玉が黄道を巡る</p>
+    <figure class="print print--large" data-rise style="--i:3">
+      <video autoplay muted loop playsinline preload="metadata" poster="assets/meguru-turntable-poster.webp" width="700" height="620" aria-label="巡る天の心臓の全体が台ごとゆっくり回るレンダリング。金色の傾いた天球の環に十二宮の記号、中央に心臓部、三脚と足輪">
+        <source src="assets/meguru-turntable-render.mp4" type="video/mp4">
+      </video>
+      <figcaption class="cap"><span class="only-wide">レンダリング（OpenSCAD）。実機の写真ではありません</span><span class="only-narrow">レンダリング（実機は未印刷）</span></figcaption>
+    </figure>
 
-<div class="gif"><img src="precession_v7.gif" alt="歳差デモ" loading="lazy"></div>
-<p class="cap">歳差デモ — 傾いた心臓の回転軸そのものが円錐を描く (実機は地下輪列 1/695.35 が自動で駆動)</p>
+    <figure class="print print--small" data-rise style="--i:3">
+      <div class="xfade">
+        <img src="assets/antikythera-fragment-a-960.webp" width="960" height="960" fetchpriority="high" decoding="async" alt="アンティキティラ機構の最大の断片。緑青に覆われた青銅の大歯車が展示ケースの闇に浮かぶ">
+        <img src="assets/antikythera-fragment-b-800.webp" width="800" height="800" decoding="async" alt="アンティキティラ機構の断片。重なった青銅板と歯車の縁">
+        <img src="assets/antikythera-fragment-c-800.webp" width="800" height="800" decoding="async" alt="アンティキティラ機構の断片。目盛りの刻まれた弧と崩れた青銅板">
+      </div>
+      <figcaption class="cap">祖先: アンティキティラ機構の断片</figcaption>
+    </figure>
 
-<div class="cards">
-  <a class="card" href="mechanism-explainer-v6.html"><span class="ic">🔭</span><div><h3>三つの軸はどう巡るのか (機構解説)</h3><p>動力の川・側面模式図・考証表・Q&A。GIF埋め込みの読み物 (7.9MB)</p></div></a>
-<a class="card" href="anatomy-v7.html"><span class="ic">🫀</span><div><h3>触れる解剖図 — ノブを回して分解する</h3><p>ホバーでノブが回り、月・年・歳差が同じ比で巡る。Space で Stage 順に 9 つの組立が離れる。読み値も動きも歯数の比から (単体 HTML・0.8MB)</p></div></a>
-<a class="card" href="libration-v7.html"><span class="ic">🌙</span><div><h3>Fig 2 秤動の楕円歯車 — 月はなぜうなずくか</h3><p>内枠を回すと、腕に固定した楕円 E1 の上をスタッドの E2 が転がり、戻り歯車 12T×12T が自転を消して首振りだけが残る。針が ±29° (実月 ±7.9°) を読む (単体 HTML・0.3MB)</p></div></a>
-  <a class="card" href="kumitate-guide-v6.html"><span class="ic">🔧</span><div><h3>組み立ての書</h3><p>Stage 0〜4 の積み上げ手順。哲学は「各段で必ず動く」</p></div></a>
-  <a class="card" href="print-plan-v6.html"><span class="ic">🖨️</span><div><h3>印刷計画書</h3><p>48部品・樹脂179cc・18プレート・約21時間の段取り (実測データから)</p></div></a>
-  <a class="card" href="adjacency-ledger-v6.html"><span class="ic">📋</span><div><h3>隣接台帳 (検証記録)</h3><p>噛合16+接触30=46関係の全数監査。「ぶつからない」と「ちゃんと触れている」は別の検査</p></div></a>
-</div>
+    <div class="hero-foot">
+    <h1 class="hero-title lines">
+      <span class="line"><span data-line style="--i:0">アンティキティラ機構の、</span></span>
+      <span class="line"><span data-line style="--i:1">卓上の子孫</span></span>
+    </h1>
+    <p class="hero-sentence" data-rise style="--i:2">心臓は3軸のトゥールビヨン。光造形で刷るためのオープンソースの設計です。実機はまだ印刷されていません。</p>
+    </div>
+  </header>
 
-<div class="facts">
-  <b>設計の事実:</b> 3Dプリント部品48個+真鍮軸3本・歯車35枚・修正48件の検証履歴・ 検査は collide / bite / シェル / engage / 総当たり / 重力 / 付け替え経路 の七つの網。置き方はアーミラリーの三脚+足輪<br>
-  <b>考証:</b> 月の自転1:1 (厳密) / 太陽年 0.19% / 交点歳差 0.18% — 古代の設計思想 (整数比の歯車) をそのまま延長。<br>
-  <b style="color:#d4614a;">訂正 (2026-09-28):</b> 以前は交点歳差を「誤差 0.10%」と掲載していましたが、比べる相手が天文の実値でなく設計目標だったこと、遊星段の連成を計算に入れていなかったことの二点で誤りで、実際は −1.37% でした。v0.7.1 で地下輪列の最終段を65Tに変え 0.18% にしています。<br>
-  <b>状態:</b> 設計・検証フェーズ完了。<b>実機は未印刷</b> — 光造形プリンタでの実体化はこれから。
-</div>
+  <section class="intro" aria-label="この機械が仕込んだもの">
+    <p class="stairs">
+      <span data-reveal style="--i:0">2000年前の天文計算機の子孫に、</span>
+      <span data-reveal style="--i:1">月の秤動と、</span>
+      <span data-reveal style="--i:2">サロス周期と、</span>
+      <span data-reveal style="--i:3">傾く天球と、</span>
+      <span data-reveal style="--i:4">18.6年の交点歳差を。</span>
+    </p>
+    <div class="intro-pics">
+      <img data-settle style="--i:5" src="assets/antikythera-fragment-b-800.webp" width="800" height="800" loading="lazy" decoding="async" alt="アンティキティラ機構の断片。何枚もの青銅板が重なり、縁に歯の跡が残る">
+      <img data-settle style="--i:6" src="assets/antikythera-fragment-c-800.webp" width="800" height="800" loading="lazy" decoding="async" alt="アンティキティラ機構の断片。弧状の目盛り板と、その下の崩れた青銅">
+    </div>
+    <p class="intro-note" data-reveal style="--i:7">すべて歯数の整数比から。家庭医 たま × Claude (AI) の共作（2026-07〜08）。</p>
+  </section>
 
-<footer>
-  家庭医 たま × Claude (AI) の共作 (2026-07〜08) — OpenSCAD による全パラメトリック設計<br>
-  「学び方をデザインする」の実験: 2000年前の学びの装置を、自分の手で組み直す
+  <section class="scene" id="devices" aria-labelledby="devices-title">
+    <div class="scene-pin">
+      <img class="scene-bg" src="assets/antikythera-fragment-a-1920.webp" srcset="assets/antikythera-fragment-a-960.webp 960w, assets/antikythera-fragment-a-1920.webp 1920w" sizes="100vw" width="1920" height="1920" loading="lazy" decoding="async" alt="">
+      <div class="scene-scrim"></div>
+      <ol class="steps">
+        <li data-step="0" class="is-active"><h2 id="devices-title">四つの天文の仕掛け</h2></li>
+        <li data-step="1">月がうなずく、秤動</li>
+        <li data-step="2">食を刻む、サロス周期</li>
+        <li data-step="3">十二宮を彫った、傾く天球</li>
+        <li data-step="4"><span class="num">18.6</span>年で一巡り、交点歳差</li>
+        <li data-step="5">すべて歯数の整数比から</li>
+      </ol>
+      <figure class="step-pic l t1" data-step="1"><img src="assets/page-libration-v7.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「秤動の楕円歯車」の画面。月球の軸と楕円歯車の線画"></figure>
+      <figure class="step-pic r t2" data-step="1"><img src="assets/meguru-turntable-still-18.webp" width="700" height="620" loading="lazy" decoding="async" alt="傾いた心臓部と月球のレンダリング"><figcaption class="cap">レンダリング</figcaption></figure>
+      <figure class="step-pic l t2" data-step="2"><img src="assets/page-anatomy-v7.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「触れる解剖図」の画面。三つの軸の線画"></figure>
+      <figure class="step-pic r t3" data-step="2"><img src="assets/meguru-precession-poster.webp" width="700" height="550" loading="lazy" decoding="async" alt="サロスの環と傾いた天球の環を間近に見たレンダリング"><figcaption class="cap">レンダリング</figcaption></figure>
+      <figure class="step-pic l t3" data-step="3"><img src="assets/meguru-turntable-still-36.webp" width="700" height="620" loading="lazy" decoding="async" alt="十二宮の記号を彫った傾く天球の環のレンダリング"><figcaption class="cap">レンダリング</figcaption></figure>
+      <figure class="step-pic r t4" data-step="3"><img src="assets/page-mechanism-explainer-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「三つの軸はどう巡るのか」の画面"></figure>
+      <figure class="step-pic l t4 phone-pic" data-step="4"><video muted loop playsinline preload="none" poster="assets/meguru-precession-poster.webp" width="700" height="550" aria-label="ターンテーブルが背骨ごとゆっくり逆行するレンダリング"><source src="assets/meguru-precession-render.mp4" type="video/mp4"></video><figcaption class="cap">レンダリング</figcaption></figure>
+      <figure class="step-pic r t1" data-step="4"><img src="assets/meguru-turntable-still-54.webp" width="700" height="620" loading="lazy" decoding="async" alt="三脚と足輪の上で回るターンテーブルのレンダリング"><figcaption class="cap">レンダリング</figcaption></figure>
+      <figure class="step-pic r t2" data-step="5"><img src="assets/page-adjacency-ledger-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「隣接台帳」の画面。噛み合う歯車の組と歯数の表"></figure>
+    </div>
+    <div class="scene-markers" aria-hidden="true">
+      <div data-mark="0" style="top:0"></div><div data-mark="1" style="top:70vh"></div><div data-mark="2" style="top:140vh"></div>
+      <div data-mark="3" style="top:210vh"></div><div data-mark="4" style="top:280vh"></div><div data-mark="5" style="top:350vh"></div>
+    </div>
+  </section>
+
+  <section class="live" aria-labelledby="live-title">
+    <div class="live-text">
+      <h3 id="live-title" data-reveal style="--i:0">あなたの日付から、交点はどこまで</h3>
+      <p data-reveal style="--i:1">月の交点は<span class="num">18.6</span>年で天を一巡りします。この機械では、ノブを回すとターンテーブルが背骨ごと逆行して、それを刻みます（誤差 <span class="num">+0.18%</span>）。日付を入れると、その日から今日までに交点がどこまで巡ったかを描きます。</p>
+      <form class="live-form" onsubmit="return false" data-reveal style="--i:2">
+        <label for="since">日付</label>
+        <input id="since" type="date" value="2000-01-01" min="1900-01-01" max="2100-12-31">
+      </form>
+    </div>
+    <div class="live-dial" aria-live="polite">
+      <svg class="dial" viewBox="0 0 200 200" role="img" aria-labelledby="dial-desc" data-settle style="--i:1">
+        <title id="dial-desc">模式図。上から見たターンテーブル（冠環の歯）と、交点を指す針。外周の目盛りは1年ごとで、18.6年で一巡り</title>
+        <circle cx="100" cy="100" r="99" fill="var(--surface)"/>
+        <path id="dial-trail" d="M100 6A94 94 0 0 0 66.31 187.76" fill="none" stroke="var(--accent)" stroke-width="3.2" stroke-linecap="butt" opacity="0.75"/>
+        <path d="M69.84 14.14L67.85 8.48M43.09 28.99L39.34 24.31M22.77 51.86L17.68 48.69M11.18 80.18L5.33 78.87M9.64 110.73L3.68 111.44M18.3 140.08L12.91 142.72M36.2 164.89L31.99 169.17M61.31 182.37L58.76 187.8M90.79 190.53L90.19 196.5M121.32 188.47L122.72 194.3M149.43 176.4L152.69 181.44M171.96 155.7L176.71 159.37M186.35 128.7L192.05 130.6M190.99 98.46L196.99 98.36M185.34 68.4L190.96 66.31M170.04 41.9L174.66 38.07M146.82 21.97L149.91 16.83M118.32 10.86L119.53 4.99" stroke="var(--muted)" stroke-width="1.1" fill="none"/>
+        <path d="M100 14.5L100 1" stroke="var(--ink)" stroke-width="1.8"/>
+        <g class="dial-labels"><text x="16.09" y="109.97">5</text><text x="119.8" y="182.15">10</text><text x="179.24" y="70.65">15</text></g>
+        <g id="dial-turntable" transform="rotate(-159 100 100)">
+          <circle cx="100" cy="100" r="77.5" fill="var(--accent-deep)"/>
+          <path d="M102.29 32.54L103.06 22.56L96.94 22.56L97.71 32.54ZM92.44 32.92L91.75 22.94L85.7 23.83L87.91 33.59ZM82.76 34.74L80.62 24.96L74.76 26.72L78.37 36.06ZM73.44 37.95L69.9 28.58L64.36 31.18L69.29 39.89ZM64.69 42.47L59.82 33.73L54.72 37.1L60.87 45ZM56.69 48.23L50.6 40.29L46.05 44.36L53.28 51.28ZM49.61 55.09L42.43 48.11L38.52 52.81L46.68 58.61ZM43.61 62.9L35.49 57.05L32.31 62.27L41.22 66.81ZM38.81 71.51L29.92 66.9L27.53 72.53L37.02 75.72ZM35.31 80.72L25.85 77.46L24.31 83.37L34.15 85.15ZM33.19 90.35L23.36 88.49L22.69 94.57L32.69 94.9ZM32.5 100.18L22.5 99.77L22.72 105.88L32.67 104.75ZM33.25 110L23.29 111.06L24.4 117.07L34.08 114.51ZM35.41 119.61L25.72 122.11L27.69 127.9L36.89 123.95ZM38.96 128.81L29.73 132.69L32.53 138.13L41.05 132.88ZM43.8 137.39L35.24 142.57L38.8 147.55L46.47 141.12ZM49.85 145.17L42.13 151.55L46.37 155.95L53.02 148.47ZM56.96 152L50.25 159.43L55.09 163.16L60.58 154.79ZM64.99 157.71L59.43 166.04L64.77 169.03L68.98 159.95ZM73.76 162.19L69.48 171.24L75.19 173.42L78.04 163.83ZM83.1 165.35L80.18 174.92L86.15 176.25L87.57 166.35ZM92.79 167.11L91.3 177.01L97.4 177.46L97.36 167.45ZM102.64 167.45L102.6 177.46L108.7 177.01L107.21 167.11ZM112.43 166.35L113.85 176.25L119.82 174.92L116.9 165.35ZM121.96 163.83L124.81 173.42L130.52 171.24L126.24 162.19ZM131.02 159.95L135.23 169.03L140.57 166.04L135.01 157.71ZM139.42 154.79L144.91 163.16L149.75 159.43L143.04 152ZM146.98 148.47L153.63 155.95L157.87 151.55L150.15 145.17ZM153.53 141.12L161.2 147.55L164.76 142.57L156.2 137.39ZM158.95 132.88L167.47 138.13L170.27 132.69L161.04 128.81ZM163.11 123.95L172.31 127.9L174.28 122.11L164.59 119.61ZM165.92 114.51L175.6 117.07L176.71 111.06L166.75 110ZM167.33 104.75L177.28 105.88L177.5 99.77L167.5 100.18ZM167.31 94.9L177.31 94.57L176.64 88.49L166.81 90.35ZM165.85 85.15L175.69 83.37L174.15 77.46L164.69 80.72ZM162.98 75.72L172.47 72.53L170.08 66.9L161.19 71.51ZM158.78 66.81L167.69 62.27L164.51 57.05L156.39 62.9ZM153.32 58.61L161.48 52.81L157.57 48.11L150.39 55.09ZM146.72 51.28L153.95 44.36L149.4 40.29L143.31 48.23ZM139.13 45L145.28 37.1L140.18 33.73L135.31 42.47ZM130.71 39.89L135.64 31.18L130.1 28.58L126.56 37.95ZM121.63 36.06L125.24 26.72L119.38 24.96L117.24 34.74ZM112.09 33.59L114.3 23.83L108.25 22.94L107.56 32.92Z" fill="var(--accent)"/>
+          <circle cx="100" cy="100" r="65.0" fill="var(--bg)"/>
+          <path d="M97.6 114L98.9 40L100 3L101.1 40L102.4 114Z" fill="var(--ink)"/>
+          <circle cx="100" cy="100" r="7.5" fill="var(--accent)"/>
+          <circle cx="100" cy="100" r="2.6" fill="var(--bg)"/>
+        </g>
+      </svg>
+      <p class="live-out num" id="live-out" data-reveal style="--i:3">1周と159°</p>
+      <p class="live-sub num" id="live-sub" data-reveal style="--i:4">2000年1月1日から26.8年。18.6年で1周として計算し、逆行の向きに描いています。</p>
+      <p class="cap" data-reveal style="--i:5">模式図: 上から見たターンテーブルと冠環の歯。外周の目盛りは1年ごと。針は入れた日付に真上を指し、そこから逆行します。</p>
+    </div>
+  </section>
+
+  <section class="proof" id="status">
+    <div class="names" data-reveal style="--i:0">
+      <h2>いまの状態は、</h2>
+      <p>v0.7.3 まで設計と検証済み。<span class="name">総当たり</span>、<span class="name">重力</span>、<span class="name">付け替え経路</span>、<span class="name">トルク</span>、<span class="name">浮き</span>、<span class="name">倒れにくさ</span>。<span class="end">実機は未印刷。</span></p>
+    </div>
+    <div class="proof-more">
+      <p data-reveal style="--i:1">設計・検証の区切りは <span class="num">2026-09-28</span>。20剛体の総当たり（手回し／モーターの2モード）、重力（支えの有無）、モーターの揺りかごを前へ滑らせる付け替え経路の掃引までを通し、修正45件の検証履歴を残しています。実体化の記録は、印刷したらリポジトリに追記されます。</p>
+      <p data-reveal style="--i:2">訂正も残しています。交点歳差の誤差を以前「<span class="num">+0.10%</span>」と載せていましたが、比べる相手が天文の実値（<span class="num">230.05</span>朔望月）でなく設計目標（<span class="num">228</span>）で、遊星段の連成も入れていなかったため、実際は <span class="num">−1.37%</span> でした。v0.7.1 で地下輪列の最終段を 65T に変え、連成込みで <span class="num">+0.18%</span> にしています。<a class="link" href="https://github.com/Tama831/desktop-antikythera-mechanism#訂正--correction-2026-09-28">訂正の記録を読む</a></p>
+    </div>
+  </section>
+
+  <section class="files" id="repo" aria-labelledby="repo-title">
+    <div class="files-pic">
+      <div class="files-frame" data-settle>
+        <img class="is-on" data-for="0" src="assets/meguru-turntable-poster.webp" width="700" height="620" loading="lazy" decoding="async" alt="巡る天の心臓の全体のレンダリング">
+        <img data-for="1" src="assets/meguru-turntable-still-18.webp" width="700" height="620" loading="lazy" decoding="async" alt="別の角度から見た全体のレンダリング">
+        <img data-for="2" src="assets/page-kumitate-guide-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「組み立ての書」の画面">
+        <img data-for="3" src="assets/page-adjacency-ledger-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「隣接台帳」の画面">
+        <img data-for="4" src="assets/page-print-plan-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="解説ページ「印刷計画書」の画面">
+        <img data-for="5" src="assets/meguru-turntable-still-36.webp" width="700" height="620" loading="lazy" decoding="async" alt="全体のレンダリング。三脚と足輪">
+        <img data-for="6" src="assets/meguru-turntable-still-54.webp" width="700" height="620" loading="lazy" decoding="async" alt="三脚で立つ全体のレンダリング">
+      </div>
+      <p class="cap">機械の画像はすべてレンダリングです</p>
+    </div>
+    <div class="files-body">
+      <h2 id="repo-title" data-reveal style="--i:0">リポジトリの中身</h2>
+      <ul class="file-list">
+        <li class="file is-active" data-i="0" data-reveal style="--i:1"><button class="file-row" type="button" aria-expanded="true"><span class="file-name">meguru_v6.scad</span><span class="file-fact">OpenSCAD</span></button><div class="file-desc"><div><p>全パラメトリック設計。衝突・噛み合い・シェル・engage の検証 PART 込み。</p></div></div></li>
+        <li class="file" data-i="1" data-reveal style="--i:2"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">stl/</span><span class="file-fact num">38ファイル・48個</span></button><div class="file-desc"><div><p>印刷部品。Phrozen Sonic Mini 4K 想定、タフレジン推奨。</p></div></div></li>
+        <li class="file" data-i="2" data-reveal style="--i:3"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">BOM.md</span><span class="file-fact">部品表</span></button><div class="file-desc"><div><p>部品表・輪列仕様・組立手順。真鍮丸棒 φ3（60 / 27.4 / 9.9mm）、28BYJ-48、M3 ローレットねじなど、印刷しない部品もここに。</p></div></div></li>
+        <li class="file" data-i="3" data-reveal style="--i:4"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">mesh-verification.md</span><span class="file-fact num">修正45件</span></button><div class="file-desc"><div><p>修正45件の検証履歴。検査の四点測量の記録。</p></div></div></li>
+        <li class="file" data-i="4" data-reveal style="--i:5"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">verify_v7.sh ほか</span><span class="file-fact">全数検証</span></button><div class="file-desc"><div><p>全数検証の台本。Manifold バックエンド付きの OpenSCAD（2025年以降）と Python3 が前提で、数分で回ります。</p></div></div></li>
+        <li class="file" data-i="5" data-reveal style="--i:6"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">pairwise.sh ほか</span><span class="file-fact">総当たりと重力</span></button><div class="file-desc"><div><p>20剛体の総当たり（手回し／モーターの2モード）、重力、付け替え経路の掃引。physics_check.py はトルク・浮き・倒れにくさの机上計算。</p></div></div></li>
+        <li class="file" data-i="6" data-reveal style="--i:7"><button class="file-row" type="button" aria-expanded="false"><span class="file-name">stands.scad</span><span class="file-fact">選ばなかった案</span></button><div class="file-desc"><div><p>置き方の触れる比較で選ばなかった案（三つ足・台座ドラム）の記録。選んだのはアーミラリーの三脚と足輪です。</p></div></div></li>
+      </ul>
+      <p class="files-note" data-reveal style="--i:8">印刷は光造形 XY 35µm クラスが前提です。FDM では小歯（m0.5）と提灯ピン d1.6 の再現が困難です。</p>
+      <p class="files-go" data-reveal style="--i:9"><a class="link" href="https://github.com/Tama831/desktop-antikythera-mechanism">GitHub でリポジトリを見る</a></p>
+    </div>
+  </section>
+
+  <section class="pages" id="pages" aria-labelledby="pages-title">
+    <div class="pages-list">
+      <h2 id="pages-title" data-reveal style="--i:0">解説ページ</h2>
+      <ul class="page-links">
+        <li data-reveal style="--i:1"><a class="page-link is-active" data-i="0" href="mechanism-explainer-v6.html"><span class="page-name">機構解説</span><span class="page-sub">三つの軸はどう巡るのか</span></a></li>
+        <li data-reveal style="--i:2"><a class="page-link" data-i="1" href="anatomy-v7.html"><span class="page-name">触れる解剖図</span><span class="page-sub">全体を、三つの軸ごとに</span></a></li>
+        <li data-reveal style="--i:3"><a class="page-link" data-i="2" href="libration-v7.html"><span class="page-name">秤動の楕円歯車</span><span class="page-sub">触れる解剖図・月がうなずく仕組み</span></a></li>
+        <li data-reveal style="--i:4"><a class="page-link" data-i="3" href="kumitate-guide-v6.html"><span class="page-name">組み立ての書</span><span class="page-sub">土台から電動化まで</span></a></li>
+        <li data-reveal style="--i:5"><a class="page-link" data-i="4" href="print-plan-v6.html"><span class="page-name">印刷計画書</span><span class="page-sub">Phrozen Sonic Mini 4K で刷る段取り</span></a></li>
+        <li data-reveal style="--i:6"><a class="page-link" data-i="5" href="adjacency-ledger-v6.html"><span class="page-name">隣接台帳</span><span class="page-sub">隣り合う部品どうしの検査の台帳</span></a></li>
+      </ul>
+    </div>
+    <div class="pages-frame" aria-hidden="true" data-settle>
+      <img class="is-on" data-for="0" src="assets/page-mechanism-explainer-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+      <img data-for="1" src="assets/page-anatomy-v7.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+      <img data-for="2" src="assets/page-libration-v7.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+      <img data-for="3" src="assets/page-kumitate-guide-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+      <img data-for="4" src="assets/page-print-plan-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+      <img data-for="5" src="assets/page-adjacency-ledger-v6.webp" width="960" height="1200" loading="lazy" decoding="async" alt="">
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-cols">
+    <div class="foot-col" data-reveal style="--i:0">
+      <p class="first">巡る天の心臓 / Meguru</p>
+      <p>家庭医 たま × Claude (AI) の共作（2026-07〜08）</p>
+      <p>MIT ライセンス</p>
+    </div>
+    <div class="foot-col" data-reveal style="--i:1">
+      <p class="first">解説</p>
+      <ul>
+        <li><a class="link" href="mechanism-explainer-v6.html">機構解説</a></li>
+        <li><a class="link" href="anatomy-v7.html">触れる解剖図</a></li>
+        <li><a class="link" href="kumitate-guide-v6.html">組み立ての書</a></li>
+        <li><a class="link" href="print-plan-v6.html">印刷計画書</a></li>
+        <li><a class="link" href="index-classic.html">以前の入口ページ</a></li>
+      </ul>
+    </div>
+    <div class="foot-col" data-reveal style="--i:2">
+      <p class="first">リポジトリ</p>
+      <ul>
+        <li><a class="link" href="https://github.com/Tama831/desktop-antikythera-mechanism">GitHub</a></li>
+        <li><a class="link" href="https://github.com/Tama831/desktop-antikythera-mechanism/blob/main/README.md">README</a></li>
+        <li><a class="link" href="https://github.com/Tama831/desktop-antikythera-mechanism#訂正--correction-2026-09-28">訂正の記録</a></li>
+      </ul>
+    </div>
+    <div class="foot-col" data-reveal style="--i:3">
+      <p class="first">写真とレンダリング</p>
+      <p class="credits">写真: <a href="https://commons.wikimedia.org/wiki/File:Antikythera_Fragment_A_(Front).webp">“Antikythera Fragment A (Front)”</a>、<a href="https://commons.wikimedia.org/wiki/File:Antikythera_Fragment_B_(Front).webp">“Fragment B (Front)”</a>、<a href="https://commons.wikimedia.org/wiki/File:Antikythera_Fragment_C_(Front).webp">“Fragment C (Front)”</a> by Logg Tandy, <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>, via Wikimedia Commons（縮小し、表示では切り抜きと明るさの調整をしています）。機械の画像は OpenSCAD のレンダリング（背景色のみ差し替え）と、解説ページの画面です。</p>
+    </div>
+  </div>
+  <div class="inscription">
+    <svg viewBox="0 0 1000 118" role="img" aria-label="ΜΗΧΑΝΗ ΟΥΡΑΝΟΥ" data-reveal style="--i:4">
+      <text x="2" y="98" font-size="82" textLength="430" lengthAdjust="spacing">ΜΗΧΑΝΗ</text>
+      <text x="500" y="98" font-size="82" textLength="496" lengthAdjust="spacing">ΟΥΡΑΝΟΥ</text>
+    </svg>
+    <p class="legal"><span>台座の裏に彫る、隠し刻印。</span><span>MIT License</span></p>
+  </div>
 </footer>
-<p class="back"><a href="https://github.com/Tama831/desktop-antikythera-mechanism">⚙ GitHub — 設計ソース (OpenSCAD)・STL・検証台帳</a></p>
-</div>
+
+<script>
+(() => {
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* entrances: each part once, in reading order */
+  const watch = (margin) => new IntersectionObserver((entries, io) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+  }, { rootMargin: margin, threshold: 0.1 });
+  const reveal = watch('0px 0px -12% 0px'), revealLast = watch('0px');
+  document.querySelectorAll('[data-reveal], [data-settle]').forEach((el) => (el.closest('.foot') ? revealLast : reveal).observe(el));
+  document.addEventListener('visibilitychange', () => document.documentElement.classList.toggle('is-hidden', document.hidden));
+
+  /* hero and scene videos: play only when allowed and visible */
+  for (const v of document.querySelectorAll('video')) {
+    const io = new IntersectionObserver(([e]) => {
+      if (calm.matches) { v.pause(); return; }
+      if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+    }, { threshold: 0.1 });
+    io.observe(v);
+  }
+
+  /* features: the active statement steps down as the reader scrolls */
+  const steps = [...document.querySelectorAll('.steps li')];
+  const pics = [...document.querySelectorAll('.step-pic')];
+  const setStep = (n) => {
+    steps.forEach((s) => s.classList.toggle('is-active', +s.dataset.step === n));
+    pics.forEach((p) => p.classList.toggle('is-on', +p.dataset.step === n));
+  };
+  const marks = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) setStep(+e.target.dataset.mark);
+  }, { rootMargin: '-50% 0px -50% 0px' });
+  document.querySelectorAll('[data-mark]').forEach((m) => marks.observe(m));
+
+  /* the live thing: how far the lunar node has turned since a date, on the turntable */
+  const input = document.getElementById('since');
+  const out = document.getElementById('live-out');
+  const sub = document.getElementById('live-sub');
+  const turntable = document.getElementById('dial-turntable');
+  const trail = document.getElementById('dial-trail');
+  const dial = turntable.closest('svg');
+  const fmt = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  const arc = (a) => {  // the trail along the year scale, from the date (top) to the needle, anticlockwise
+    if (a < 0.05) return '';
+    a = Math.min(a, 359.95) * Math.PI / 180;
+    const x = 100 - 94 * Math.sin(a), y = 100 - 94 * Math.cos(a);
+    return `M100 6A94 94 0 ${a > Math.PI ? 1 : 0} 0 ${x.toFixed(2)} ${y.toFixed(2)}`;
+  };
+  let shown = 0, target = 0, anim = 0, seen = false;
+  const paint = (a) => {  // a: degrees turned, full turns included
+    turntable.setAttribute('transform', `rotate(${(-a).toFixed(2)} 100 100)`);
+    trail.setAttribute('d', arc(((a % 360) + 360) % 360));
+  };
+  const turnTo = (a, ms) => {
+    cancelAnimationFrame(anim);
+    target = a;
+    if (calm.matches || !seen) { shown = a; if (seen || calm.matches) paint(a); return; }
+    const from = shown, t0 = performance.now();
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / ms);
+      shown = from + (a - from) * ease(t);
+      paint(shown);
+      if (t < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  };
+  const draw = () => {
+    const d = new Date(input.value + 'T00:00:00');
+    if (isNaN(d)) return;
+    const now = new Date();
+    const years = Math.abs(now - d) / 86400000 / 365.2422;
+    const turns = years / 18.6;
+    const full = Math.floor(turns);
+    let deg = Math.round((turns - full) * 360);
+    if (deg === 360) deg = 0;
+    out.textContent = full ? `${full}周と${deg}°` : `${deg}°`;
+    const span = d <= now ? `${fmt(d)}から${years.toFixed(1)}年。` : `${fmt(d)}まで${years.toFixed(1)}年。`;
+    sub.textContent = span + '18.6年で1周として計算し、逆行の向きに描いています。';
+    // a new date turns the table the short way round; the first view turns it through every full round
+    const exact = turns * 360;
+    if (!seen) { turnTo(exact, 0); return; }
+    const cur = ((shown % 360) + 360) % 360;
+    const delta = ((((exact % 360) - cur) % 360) + 540) % 360 - 180;
+    turnTo(shown + delta, 700);
+  };
+  input.addEventListener('input', draw);
+  draw();
+  if (calm.matches || !('IntersectionObserver' in window)) { seen = true; paint(target); }
+  else {
+    paint(0);  // the table waits at the date's position until the dial is in view
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      seen = true;
+      const full = target; shown = 0;
+      turnTo(full, Math.min(4200, 1600 + full * 4));
+    }, { threshold: 0.45 });
+    io.observe(dial);
+  }
+
+  /* proof: one name at a time is lit */
+  const names = [...document.querySelectorAll('.names .name')];
+  let lit = 0;
+  const light = () => { names.forEach((n, i) => n.classList.toggle('is-lit', i === lit)); lit = (lit + 1) % names.length; };
+  light();
+  let timer = setInterval(light, 2000);
+  document.addEventListener('visibilitychange', () => { clearInterval(timer); if (!document.hidden) timer = setInterval(light, 2000); });
+
+  /* list: the active file opens and its picture comes forward */
+  const files = [...document.querySelectorAll('.file')];
+  const frames = [...document.querySelectorAll('.files-frame img')];
+  const activate = (i) => {
+    files.forEach((f) => { const on = +f.dataset.i === i; f.classList.toggle('is-active', on); f.querySelector('.file-row').setAttribute('aria-expanded', on); });
+    frames.forEach((im) => im.classList.toggle('is-on', +im.dataset.for === i));
+  };
+  files.forEach((f) => {
+    const row = f.querySelector('.file-row'); const i = +f.dataset.i;
+    row.addEventListener('click', () => activate(i));
+    row.addEventListener('focus', () => activate(i));
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) row.addEventListener('mouseenter', () => activate(i));
+  });
+
+  /* work: the hovered or focused name lights and shows its page */
+  const links = [...document.querySelectorAll('.page-link')];
+  const shots = [...document.querySelectorAll('.pages-frame img')];
+  const show = (i) => {
+    links.forEach((l) => l.classList.toggle('is-active', +l.dataset.i === i));
+    shots.forEach((s) => s.classList.toggle('is-on', +s.dataset.for === i));
+  };
+  links.forEach((l) => { l.addEventListener('mouseenter', () => show(+l.dataset.i)); l.addEventListener('focus', () => show(+l.dataset.i)); });
+})();
+</script>
 </body>
 </html>
